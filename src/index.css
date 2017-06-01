@@ -1,0 +1,22 @@
+@font-face {
+  font-family: 'Montserrat';
+  src: url('./fonts/Montserrat-SemiBold.ttf');
+}
+
+@font-face {
+  font-family: 'Khula-Regular';
+  src: url('./fonts/Khula-Regular.ttf');
+}
+
+@font-face {
+  font-family: 'Khula-SemiBold';
+  src: url('./fonts/Khula-SemiBold.ttf');
+}
+
+h1 {
+  font-family: 'Montserrat';
+}
+
+h4 {
+  font-family: 'Khula-SemiBold';
+}
