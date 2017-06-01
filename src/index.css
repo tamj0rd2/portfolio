@@ -20,3 +20,7 @@ h1 {
 h4 {
   font-family: 'Khula-SemiBold';
 }
+
+p, div {
+  font-family: 'Khula-Regular';
+}
