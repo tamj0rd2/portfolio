@@ -19,7 +19,7 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "predeploy": "git add --all && git stash -u && npm run build",
-    "deploy": "gh-pages -d build -b master",
+    "deploy": "gh-pages -d build -b master -r git@github.com:tamj0rd2/tamj0rd2.github.io.git",
     "postdeploy": "git stash pop"
   },
   "homepage": "https://tamj0rd2.github.io"
