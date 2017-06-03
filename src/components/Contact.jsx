@@ -54,26 +54,21 @@ FormSection.propTypes = {
 }
 
 class Contact extends Component {
-  state = {
-    name: {
-      value: '',
-      isValid: null,
-      showValidation: false,
-      showHelpBlock: false
-    },
-    email: {
-      value: '',
-      isValid: null,
-      showValidation: false,
-      showHelpBlock: false
-    },
-    message: {
-      value: '',
-      isValid: null,
-      showValidation: false,
-      showHelpBlock: false
-    }
-  };
+  constructor(props) {
+    super(props)
+    let state = {};
+
+    ['name', 'email', 'message'].forEach(identifier => {
+      state[identifier] = {
+        value: '',
+        isValid: null,
+        showValidation: false,
+        showHelpBlock: false
+      }
+    })
+
+    this.state = state
+  }
 
   handleOnChange = (e, identifier) => {
     // updates the value and validation for whichever input field got changed
@@ -145,7 +140,7 @@ class Contact extends Component {
               parentState={this.state}
               onChange={this.handleOnChange}
               componentClass="textarea"
-              helpText="Please enter a message more than 5 characters long"
+              helpText="Please enter a message 5 or more characters long"
             />
 
             <Button type="submit" className="btn-primary">
