@@ -32,7 +32,9 @@ class FormSection extends Component {
           onChange={e => this.props.onChange(e, this.props.identifier)}
         />
         <FormControl.Feedback />
-        <HelpBlock>{this.props.helpText}</HelpBlock>
+        <HelpBlock className={state.showHelpBlock ? '' : 'hidden'}>
+          {this.props.helpText}
+        </HelpBlock>
       </FormGroup>
     )
   }
@@ -56,17 +58,20 @@ class Contact extends Component {
     name: {
       value: '',
       isValid: null,
-      showValidation: false
+      showValidation: false,
+      showHelpBlock: false
     },
     email: {
       value: '',
       isValid: null,
-      showValidation: false
+      showValidation: false,
+      showHelpBlock: false
     },
     message: {
       value: '',
       isValid: null,
-      showValidation: false
+      showValidation: false,
+      showHelpBlock: false
     }
   };
 
@@ -100,6 +105,8 @@ class Contact extends Component {
 
     for (let identifier in this.state) {
       newState[identifier].showValidation = true
+      // only show help block for invalid FormSections
+      newState[identifier].showHelpBlock = !newState[identifier].isValid
       this.setState({ [`${identifier}`]: newState[identifier] })
     }
   };
