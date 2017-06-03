@@ -56,10 +56,13 @@ FormSection.propTypes = {
 class Contact extends Component {
   constructor(props) {
     super(props)
-    let state = {};
+    let state = {
+      btnText: 'Send',
+      fields: {}
+    };
 
     ['name', 'email', 'message'].forEach(identifier => {
-      state[identifier] = {
+      state.fields[identifier] = {
         value: '',
         isValid: null,
         showValidation: false,
@@ -72,13 +75,13 @@ class Contact extends Component {
 
   handleOnChange = (e, identifier) => {
     // updates the value and validation for whichever input field got changed
-    let newState = R.clone(this.state[identifier])
-    newState.value = e.target.value
-    newState.isValid = this.isValid(identifier, newState.value)
+    let newState = R.clone(this.state.fields)
+    newState[identifier].value = e.target.value
+    newState[identifier].isValid = this.isValid(identifier, e.target.value)
 
     // the value changed so hide validation until the next form submission
-    newState.showValidation = false
-    this.setState({ [`${identifier}`]: newState })
+    newState[identifier].showValidation = false
+    this.setState({ fields: newState })
   };
 
   isValid = (identifier, newValue) => {
@@ -94,26 +97,67 @@ class Contact extends Component {
     }
   };
 
-  showValidation = () => {
-    // show validation for each FormSection, since we've submitted the form now
-    let newState = R.clone(this.state)
+  formIsValid = () => {
+    let noErrorsFound = true
 
-    for (let identifier in this.state) {
+    // show validation for each FormSection, since we've submitted the form now
+    let newState = R.clone(this.state.fields)
+
+    for (let identifier in newState) {
       newState[identifier].showValidation = true
       // only show help block for invalid FormSections
-      newState[identifier].showHelpBlock = !newState[identifier].isValid
-      this.setState({ [`${identifier}`]: newState[identifier] })
+      let isValid = newState[identifier].isValid
+      if (!isValid) noErrorsFound = false
+      newState[identifier].showHelpBlock = !isValid
     }
+    this.setState({ fields: newState })
+    return noErrorsFound
+  };
+
+  sendEmail = () => {
+    // using anything other than FormData causes a CORS problem
+    let formData = new FormData()
+    for (let identifier in this.state.fields) {
+      formData.append(identifier, this.state.fields[identifier].value)
+    }
+
+    // TODO: Add some error checking here at some point
+    fetch('https://enformed.io/rxgn3qgf', {
+      method: 'post',
+      body: formData
+    }).then(response => {
+      if (response.status === 200) {
+        this.setState({ btnText: 'Email sent!' })
+      }
+    })
+  };
+
+  resetFormValidation = () => {
+    // resets validation settings for all fields
+    let newState = R.clone(this.state.fields)
+
+    for (let identifier in newState) {
+      newState[identifier].isValid = null
+      newState[identifier].showHelpBlock = false
+      newState[identifier].showValidation = false
+    }
+
+    this.setState({ fields: newState })
   };
 
   handleSubmit = e => {
-    this.showValidation()
+    // stop the page from reloading on submit
     e.preventDefault()
+    if (this.formIsValid()) {
+      this.setState({ btnText: 'Sending...' })
+      this.sendEmail()
+      this.resetFormValidation()
+    }
   };
 
   render() {
     return (
-      <div>
+      <div className="contact">
         <footer className="container">
           <h1>Get in touch</h1>
 
@@ -121,7 +165,7 @@ class Contact extends Component {
             <FormSection
               labelText="Name"
               identifier="name"
-              parentState={this.state}
+              parentState={this.state.fields}
               onChange={this.handleOnChange}
               inputType="text"
               helpText={`Must be 3-50 characters long. Don't use special
@@ -130,7 +174,7 @@ class Contact extends Component {
             <FormSection
               labelText="E-mail address"
               identifier="email"
-              parentState={this.state}
+              parentState={this.state.fields}
               onChange={this.handleOnChange}
               inputType="email"
               helpText="Please enter a valid email address."
@@ -138,14 +182,22 @@ class Contact extends Component {
             <FormSection
               labelText="Your message"
               identifier="message"
-              parentState={this.state}
+              parentState={this.state.fields}
               onChange={this.handleOnChange}
               componentClass="textarea"
               helpText="Please enter a message more than 5 characters long."
             />
 
-            <Button type="submit" className="btn-primary">
-              Send
+            <Button
+              type="submit"
+              className="btn-primary"
+              bsStyle={this.state.btnText === 'Email sent!' ? 'success' : null}
+              disabled={R.contains(this.state.btnText, [
+                'Sending...',
+                'Email sent!'
+              ])}
+            >
+              {this.state.btnText}
             </Button>
           </form>
         </footer>
