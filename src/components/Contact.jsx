@@ -124,7 +124,8 @@ class Contact extends Component {
               parentState={this.state}
               onChange={this.handleOnChange}
               inputType="text"
-              helpText="Don't use special characters other than spaces, underscores, hyphens and periods."
+              helpText={`Must be 3-50 characters long. Don't use special
+              characters other than spaces, underscores, hyphens and periods.`}
             />
             <FormSection
               labelText="E-mail address"
@@ -140,7 +141,7 @@ class Contact extends Component {
               parentState={this.state}
               onChange={this.handleOnChange}
               componentClass="textarea"
-              helpText="Please enter a message 5 or more characters long"
+              helpText="Please enter a message more than 5 characters long."
             />
 
             <Button type="submit" className="btn-primary">
