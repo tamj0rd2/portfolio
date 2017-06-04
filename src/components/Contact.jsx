@@ -7,7 +7,8 @@ import {
   FormControl,
   ControlLabel,
   HelpBlock,
-  Button
+  Button,
+  Alert
 } from 'react-bootstrap'
 
 class FormSection extends Component {
@@ -58,6 +59,10 @@ class Contact extends Component {
     super(props)
     let state = {
       btnText: 'Send',
+      btnClass: true,
+      alertText: '',
+      alertClass: null,
+      showAlert: false,
       fields: {}
     };
 
@@ -115,20 +120,20 @@ class Contact extends Component {
   };
 
   sendEmail = () => {
-    // using anything other than FormData causes a CORS problem
+    // using JSON.stringify doesn't send any data in the request
     let formData = new FormData()
-    for (let identifier in this.state.fields) {
-      formData.append(identifier, this.state.fields[identifier].value)
-    }
+    formData.append('Name', this.state.fields.name.value)
+    formData.append('Email', this.state.fields.email.value)
+    formData.append('Message', this.state.fields.message.value)
+    formData.append('_subject', 'Portfolio response received')
+    formData.append('_gotcha', '')
 
-    // TODO: Add some error checking here at some point
-    fetch('https://enformed.io/rxgn3qgf', {
-      method: 'post',
+    return fetch('https://formspree.io/tamj0rd2@outlook.com', {
+      headers: {
+        Accept: 'application/json'
+      },
+      method: 'POST',
       body: formData
-    }).then(response => {
-      if (response.status === 200) {
-        this.setState({ btnText: 'Email sent!' })
-      }
     })
   };
 
@@ -145,13 +150,45 @@ class Contact extends Component {
     this.setState({ fields: newState })
   };
 
+  showAlert = status => {
+    let alertText = ''
+    let btnClass = ''
+
+    if (status === 'success') {
+      alertText = 'Your email has been sent :)'
+      btnClass = 'hidden'
+    } else if (status === 'danger') {
+      alertText = 'Something went wrong. Please try again.'
+    }
+    this.setState({
+      btnText: 'Send',
+      btnClass: btnClass,
+      showAlert: true,
+      alertClass: status,
+      alertText: alertText
+    })
+  };
+
   handleSubmit = e => {
     // stop the page from reloading on submit
     e.preventDefault()
+
+    // this isn't in the if statement because I want the alert to be hidden
+    // every time the form gets submitted, even if the form is invalid.
+    this.setState({ showAlert: false, alertClass: null })
+
     if (this.formIsValid()) {
       this.setState({ btnText: 'Sending...' })
       this.sendEmail()
-      this.resetFormValidation()
+        .then(response => {
+          if (response.status === 200) {
+            this.resetFormValidation()
+            this.showAlert('success')
+          } else {
+            this.showAlert('danger')
+          }
+        })
+        .catch(err => this.showAlert('danger'))
     }
   };
 
@@ -188,17 +225,24 @@ class Contact extends Component {
               helpText="Please enter a message more than 5 characters long."
             />
 
+            <Alert
+              bsStyle={this.state.alertClass}
+              className={this.state.showAlert ? '' : 'hidden'}
+            >
+              <strong>
+                {this.state.alertClass === 'success' ? 'Success' : 'Oops'}!
+              </strong>
+              &nbsp;{this.state.alertText}
+            </Alert>
+
             <Button
               type="submit"
-              className="btn-primary"
-              bsStyle={this.state.btnText === 'Email sent!' ? 'success' : null}
-              disabled={R.contains(this.state.btnText, [
-                'Sending...',
-                'Email sent!'
-              ])}
+              className={`btn-primary ${this.state.btnClass}`}
+              disabled={this.state.btnText === 'Sending...'}
             >
               {this.state.btnText}
             </Button>
+
           </form>
         </footer>
       </div>
