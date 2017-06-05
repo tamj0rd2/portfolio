@@ -13,24 +13,43 @@
   },
   "devDependencies": {
     "@types/bootstrap": "^3.3.33",
+    "@types/chai": "^4.0.0",
+    "@types/enzyme": "^2.8.0",
     "@types/prop-types": "^15.5.1",
     "@types/ramda": "0.0.11",
     "@types/react": "^15.0.26",
     "@types/react-bootstrap": "0.0.50",
     "@types/react-dom": "^15.5.0",
+    "@types/react-test-renderer": "^15.5.0",
+    "@types/sinon": "^2.3.0",
     "@types/validator": "^6.2.0",
+    "chai": "^4.0.1",
+    "enzyme": "^2.8.2",
     "gh-pages": "^1.0.0",
     "prettier-eslint": "^6.2.3",
-    "react-scripts": "1.0.7"
+    "react-scripts": "1.0.7",
+    "react-test-renderer": "^15.5.4",
+    "sinon": "^2.3.2"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
+    "test:coverage": "react-scripts test --env=jsdom --coverage \"--collectCoverageFrom=src/**/*.{js|jsx}\" \"--collectCoverageFrom=!src/{registerServiceWorker|index}.js\"",
     "eject": "react-scripts eject",
     "predeploy": "git add --all && git stash -u && npm run build",
     "deploy": "gh-pages -d build -b master -r git@github.com:tamj0rd2/tamj0rd2.github.io.git",
     "postdeploy": "git stash pop"
+  },
+  "engines": {
+    "node": ">=6.10.3",
+    "npm": ">=3.10.10"
+  },
+  "babel": {
+    "sourceMaps": "inline",
+    "presets": [
+      "react-app"
+    ]
   },
   "homepage": "https://tamj0rd2.github.io"
 }
