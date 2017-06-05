@@ -11,7 +11,7 @@ import {
   Alert
 } from 'react-bootstrap'
 
-class FormSection extends Component {
+export class FormSection extends Component {
   // When creating a form item, we pass it the parent's state so that we can
   // programatically set the state for the correct item during the onchange
   render() {
@@ -54,9 +54,17 @@ FormSection.propTypes = {
   onChange: PropTypes.func.isRequired
 }
 
-class Contact extends Component {
+export default class Contact extends Component {
   constructor(props) {
     super(props)
+    this.handleOnChange = this.handleOnChange.bind(this)
+    this.isValid = this.isValid.bind(this)
+    this.formIsValid = this.formIsValid.bind(this)
+    this.sendEmail = this.sendEmail.bind(this)
+    this.resetFormValidation = this.resetFormValidation.bind(this)
+    this.showAlert = this.showAlert.bind(this)
+    this.handleSubmit = this.handleSubmit.bind(this)
+
     let state = {
       btnText: 'Send',
       btnClass: true,
@@ -78,7 +86,7 @@ class Contact extends Component {
     this.state = state
   }
 
-  handleOnChange = (e, identifier) => {
+  handleOnChange(e, identifier) {
     // updates the value and validation for whichever input field got changed
     let newState = R.clone(this.state.fields)
     newState[identifier].value = e.target.value
@@ -87,9 +95,9 @@ class Contact extends Component {
     // the value changed so hide validation until the next form submission
     newState[identifier].showValidation = false
     this.setState({ fields: newState })
-  };
+  }
 
-  isValid = (identifier, newValue) => {
+  isValid(identifier, newValue) {
     switch (identifier) {
       case 'name':
         return /^[A-z0-9\s._-]{3,50}$/.test(newValue)
@@ -100,9 +108,9 @@ class Contact extends Component {
       default:
         return false
     }
-  };
+  }
 
-  formIsValid = () => {
+  formIsValid() {
     let noErrorsFound = true
 
     // show validation for each FormSection, since we've submitted the form now
@@ -117,9 +125,9 @@ class Contact extends Component {
     }
     this.setState({ fields: newState })
     return noErrorsFound
-  };
+  }
 
-  sendEmail = () => {
+  sendEmail() {
     // using JSON.stringify doesn't send any data in the request
     let formData = new FormData()
     formData.append('Name', this.state.fields.name.value)
@@ -135,9 +143,9 @@ class Contact extends Component {
       method: 'POST',
       body: formData
     })
-  };
+  }
 
-  resetFormValidation = () => {
+  resetFormValidation() {
     // resets validation settings for all fields
     let newState = R.clone(this.state.fields)
 
@@ -148,9 +156,9 @@ class Contact extends Component {
     }
 
     this.setState({ fields: newState })
-  };
+  }
 
-  showAlert = status => {
+  showAlert(status) {
     let alertText = ''
     let btnClass = ''
 
@@ -167,9 +175,9 @@ class Contact extends Component {
       alertClass: status,
       alertText: alertText
     })
-  };
+  }
 
-  handleSubmit = e => {
+  handleSubmit(e) {
     // stop the page from reloading on submit
     e.preventDefault()
 
@@ -190,7 +198,7 @@ class Contact extends Component {
         })
         .catch(err => this.showAlert('danger'))
     }
-  };
+  }
 
   render() {
     return (
@@ -249,5 +257,3 @@ class Contact extends Component {
     )
   }
 }
-
-export default Contact
