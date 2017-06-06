@@ -50,3 +50,23 @@ describe('Initial values', () => {
     })
   })
 })
+
+describe('Output', () => {
+  let wrapper = shallow(<Contact />)
+
+  beforeEach(() => {
+    wrapper = shallow(<Contact />)
+  })
+
+  it('contains 3 FormSections', () => {
+    expect(wrapper.find(FormSection)).to.have.length(3)
+  })
+
+  it('contains a submit button', () => {
+    expect(wrapper.find(Button)).to.have.length(1)
+  })
+
+  it('contains an alert', () => {
+    expect(wrapper.find(Alert)).to.have.length(1)
+  })
+})
