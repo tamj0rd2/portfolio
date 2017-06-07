@@ -100,7 +100,7 @@ export default class Contact extends Component {
   isValid(identifier, newValue) {
     switch (identifier) {
       case 'name':
-        return /^[A-z0-9\s._-]{3,50}$/.test(newValue)
+        return /^[A-z0-9\s._-]{3,50}$/.test(newValue) && newValue != null
       case 'email':
         return validator.isEmail(newValue)
       case 'message':

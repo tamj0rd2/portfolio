@@ -99,4 +99,50 @@ describe('Functions', () => {
       expect(wrapper.state().fields.name.showValidation).to.be.false
     })
   })
+
+  describe('isValid', () => {
+    let validate = (identifier, newValue) => {
+      return expect(wrapper.instance().isValid(identifier, newValue))
+    }
+
+    it('returns true or false', () => {
+      validate().to.be.a('boolean')
+    })
+
+    describe('case: name', () => {
+      it('returns false if a name is not given', () => {
+        validate('name', undefined).to.be.false
+        validate('name', null).to.be.false
+      })
+
+      it('returns false if the name is less than 3 characters long', () => {
+        validate('name', 'ab').to.be.false
+        validate('name', '').to.be.false
+      })
+
+      it('returns false if the name is more than 50 characters long', () => {
+        let longName = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+        validate('name', longName).to.be.false
+      })
+
+      it('returns false if symbols other than spaces and ._- are found', () => {
+        validate('name', 'Hello!').to.be.false
+        validate('name', 'Hello &$%').to.be.false
+        validate('name', 'Hello world!').to.be.false
+        validate('name', 'Hello, world').to.be.false
+        validate('name', 'yo whatup =)').to.be.false
+      })
+
+      it('returns true if none of the above conditions are met', () => {
+        let longName = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+        validate('name', longName).to.be.true
+        validate('name', 'tamj0rd2').to.be.true
+        validate('name', 'jim.bob').to.be.true
+        validate('name', '-_-').to.be.true
+        validate('name', 'yo whatup').to.be.true
+        validate('name', 'John_Doe').to.be.true
+        validate('name', 'Sue').to.be.true
+      })
+    })
+  })
 })
