@@ -70,3 +70,33 @@ describe('Output', () => {
     expect(wrapper.find(Alert)).to.have.length(1)
   })
 })
+
+describe('Functions', () => {
+  let wrapper = shallow(<Contact />)
+  let event = { target: { value: 'A new value' } }
+
+  beforeEach(() => {
+    wrapper = shallow(<Contact />)
+  })
+
+  describe('handleOnChange', () => {
+    it('Updates the value for the input that was changed', () => {
+      expect(wrapper.state().fields.name.value).to.equal('')
+      wrapper.instance().handleOnChange(event, 'name')
+      expect(wrapper.state().fields.name.value).to.equal('A new value')
+    })
+
+    it('Marks whether or not the new input value is valid', () => {
+      expect(wrapper.state().fields.name.isValid).to.be.null
+      wrapper.instance().handleOnChange(event, 'name')
+      expect(wrapper.state().fields.name.isValid).to.be.a('boolean')
+    })
+
+    it('Hides any validation feedback that was on the FormGroup', () => {
+      wrapper.setState({ fields: { name: { showValidation: true } } })
+      expect(wrapper.state().fields.name.showValidation).to.be.true
+      wrapper.instance().handleOnChange(event, 'name')
+      expect(wrapper.state().fields.name.showValidation).to.be.false
+    })
+  })
+})
