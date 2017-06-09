@@ -134,7 +134,6 @@ export default class Contact extends Component {
   }
 
   sendEmail() {
-    // using JSON.stringify doesn't send any data in the request
     let formData = new FormData()
     formData.append('Name', this.state.fields.name.value)
     formData.append('Email', this.state.fields.email.value)
@@ -142,6 +141,7 @@ export default class Contact extends Component {
     formData.append('_subject', 'Portfolio response received')
     formData.append('_gotcha', '')
 
+    // resolves true if the email got sent, otherwise false
     return fetch('https://formspree.io/tamj0rd2@outlook.com', {
       headers: {
         Accept: 'application/json'
@@ -149,6 +149,8 @@ export default class Contact extends Component {
       method: 'POST',
       body: formData
     })
+      .then(response => response.status === 200)
+      .catch(error => false)
   }
 
   resetFormValidation() {
@@ -191,18 +193,19 @@ export default class Contact extends Component {
     // every time the form gets submitted, even if the form is invalid.
     this.setState({ showAlert: false, alertClass: null })
 
+    // TODO: formIsValid shouldn't modify state. By looking at the code it's
+    // unclear what happens if formIsValid is false.
     if (this.formIsValid()) {
       this.setState({ btnText: 'Sending...' })
-      this.sendEmail()
-        .then(response => {
-          if (response.status === 200) {
-            this.resetFormValidation()
-            this.showAlert('success')
-          } else {
-            this.showAlert('danger')
-          }
-        })
-        .catch(err => this.showAlert('danger'))
+      return this.sendEmail().then(emailSent => {
+        if (emailSent) {
+          this.resetFormValidation()
+          this.showAlert('success')
+        } else {
+          this.showAlert('danger')
+        }
+        return emailSent
+      })
     }
   }
 

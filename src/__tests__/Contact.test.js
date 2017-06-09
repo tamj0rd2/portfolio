@@ -1,12 +1,14 @@
 import _ from 'lodash'
 import sinon from 'sinon'
-import { expect } from 'chai'
-import { shallow, mount } from 'enzyme'
+import chai, { expect } from 'chai'
+import chaiAsPromised from 'chai-as-promised'
+import { shallow } from 'enzyme'
 
 import React from 'react'
-import ReactDOM from 'react-dom'
 import Contact, { FormSection } from '../components/Contact'
 import { Button, Alert } from 'react-bootstrap'
+
+chai.use(chaiAsPromised)
 
 let mergeState = (component, newState) => {
   component.setState(previousState => _.merge({}, previousState, newState))
@@ -80,6 +82,10 @@ describe('Functions', () => {
 
   beforeEach(() => {
     wrapper = shallow(<Contact />)
+  })
+
+  afterEach(() => {
+    wrapper = null
   })
 
   describe('handleOnChange', () => {
@@ -255,6 +261,41 @@ describe('Functions', () => {
         expect(instance.state.fields.email.showHelpBlock).to.be.false
         expect(instance.state.fields.message.showHelpBlock).to.be.false
       })
+    })
+  })
+
+  describe('sendEmail', () => {
+    let fetchStub
+
+    beforeEach(() => {
+      fetchStub = sinon.stub(window, 'fetch')
+    })
+
+    afterEach(() => {
+      fetchStub.restore()
+    })
+
+    it('returns a promise', () => {
+      fetchStub.resolves()
+      expect(wrapper.instance().sendEmail()).to.be.a('promise')
+    })
+
+    it('resolves to true if the email sends successfully', () => {
+      fetchStub.resolves({ status: 200 })
+      let promise = wrapper.instance().sendEmail()
+      return expect(promise).to.eventually.be.true
+    })
+
+    it('resolves to false if the status was not 200', () => {
+      fetchStub.resolves({ status: 404 })
+      let promise = wrapper.instance().sendEmail()
+      return expect(promise).to.eventually.be.false
+    })
+
+    it('resolves to false if there was an error', () => {
+      fetchStub.rejects('An error ocurred')
+      let promise = wrapper.instance().sendEmail()
+      return expect(promise).to.eventually.be.false
     })
   })
 })
