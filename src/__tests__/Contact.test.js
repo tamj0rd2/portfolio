@@ -8,20 +8,19 @@ import Contact, { FormSection } from '../components/Contact'
 import { Button, Alert } from 'react-bootstrap'
 
 describe('Initial values', () => {
+  let wrapper = shallow(<Contact />)
+
+  beforeEach(() => {
+    wrapper = shallow(<Contact />)
+  })
+
   describe('Props', () => {
     it('has the classname "contact"', () => {
-      let wrapper = shallow(<Contact />)
       expect(wrapper.prop('className')).to.equal('contact')
     })
   })
 
   describe('State', () => {
-    let wrapper = shallow(<Contact />)
-
-    beforeEach(() => {
-      wrapper = shallow(<Contact />)
-    })
-
     it('has the correct base state', () => {
       let state = wrapper.state()
       let expectedFields = ['name', 'email', 'message']
