@@ -98,9 +98,12 @@ export default class Contact extends Component {
   }
 
   isValid(identifier, newValue) {
+    if (!newValue) {
+      return false
+    }
     switch (identifier) {
       case 'name':
-        return /^[A-z0-9\s._-]{3,50}$/.test(newValue) && newValue != null
+        return /^[A-z0-9\s._-]{3,50}$/.test(newValue)
       case 'email':
         return validator.isEmail(newValue)
       case 'message':

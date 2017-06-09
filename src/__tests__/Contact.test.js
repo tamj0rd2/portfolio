@@ -111,8 +111,9 @@ describe('Functions', () => {
 
     describe('case: name', () => {
       it('returns false if a name is not given', () => {
-        validate('name', undefined).to.be.false
+        validate('name', '').to.be.false
         validate('name', null).to.be.false
+        validate('name', undefined).to.be.false
       })
 
       it('returns false if the name is less than 3 characters long', () => {
@@ -146,6 +147,12 @@ describe('Functions', () => {
     })
 
     describe('case: email', () => {
+      it('returns false if no email is given', () => {
+        validate('email', '').to.be.false
+        validate('email', null).to.be.false
+        validate('email', undefined).to.be.false
+      })
+
       it('returns false if the email address is not valid', () => {
         validate('email', 'hello, world').to.be.false
         validate('email', 'hello@world').to.be.false
