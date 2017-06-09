@@ -144,5 +144,21 @@ describe('Functions', () => {
         validate('name', 'Sue').to.be.true
       })
     })
+
+    describe('case: email', () => {
+      it('returns false if the email address is not valid', () => {
+        validate('email', 'hello, world').to.be.false
+        validate('email', 'hello@world').to.be.false
+        validate('email', 'hello@world.z').to.be.false
+        validate('email', 'hello@world!.com').to.be.false
+      })
+
+      it('returns true if the email address is valid', () => {
+        validate('email', 'a@b.com').to.be.true
+        validate('email', 'hello@world.xyz').to.be.true
+        validate('email', 'hello-world!@something.com').to.be.true
+        validate('email', 'whatup+dog@gov.org.uk').to.be.true
+      })
+    })
   })
 })
