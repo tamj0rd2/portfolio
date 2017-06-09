@@ -97,11 +97,11 @@ export default class Contact extends Component {
     this.setState({ fields: newState })
   }
 
-  isValid(identifier, newValue) {
+  isValid(validatorName, newValue) {
     if (!newValue) {
       return false
     }
-    switch (identifier) {
+    switch (validatorName) {
       case 'name':
         return /^[A-z0-9\s._-]{3,50}$/.test(newValue)
       case 'email':

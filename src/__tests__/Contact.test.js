@@ -101,15 +101,21 @@ describe('Functions', () => {
   })
 
   describe('isValid', () => {
-    let validate = (identifier, newValue) => {
-      return expect(wrapper.instance().isValid(identifier, newValue))
+    let validate = (validatorName, newValue) => {
+      return expect(wrapper.instance().isValid(validatorName, newValue))
     }
 
     it('returns true or false', () => {
       validate().to.be.a('boolean')
     })
 
-    describe('case: name', () => {
+    it('returns false for unknown validators', () => {
+      validate('hello', 'Some Value').to.be.false
+      validate('world', 'another@value.net').to.be.false
+      validate('!', 'Yet another value!').to.be.false
+    })
+
+    describe('validator: name', () => {
       it('returns false if a name is not given', () => {
         validate('name', '').to.be.false
         validate('name', null).to.be.false
@@ -146,7 +152,7 @@ describe('Functions', () => {
       })
     })
 
-    describe('case: email', () => {
+    describe('validator: email', () => {
       it('returns false if no email is given', () => {
         validate('email', '').to.be.false
         validate('email', null).to.be.false
@@ -168,7 +174,7 @@ describe('Functions', () => {
       })
     })
 
-    describe('case: message', () => {
+    describe('validator: message', () => {
       it('returns false if no message was given', () => {
         validate('message', '').to.be.false
         validate('message', null).to.be.false
