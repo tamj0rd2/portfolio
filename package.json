@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "bootstrap": "^3.3.7",
+    "lodash": "^4.17.4",
     "prop-types": "^15.5.10",
     "ramda": "^0.24.1",
     "react": "^15.5.4",
@@ -15,6 +16,7 @@
     "@types/bootstrap": "^3.3.33",
     "@types/chai": "^4.0.0",
     "@types/enzyme": "^2.8.0",
+    "@types/lodash": "^4.14.65",
     "@types/prop-types": "^15.5.1",
     "@types/ramda": "0.0.11",
     "@types/react": "^15.0.26",

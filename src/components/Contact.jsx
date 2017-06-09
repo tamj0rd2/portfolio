@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+// TODO: use lodash instead of ramda
 import R from 'ramda'
 import validator from 'validator'
 import {
@@ -10,6 +11,8 @@ import {
   Button,
   Alert
 } from 'react-bootstrap'
+
+// TODO: refactor all setState funcs to use lodash for merging
 
 export class FormSection extends Component {
   // When creating a form item, we pass it the parent's state so that we can

@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import sinon from 'sinon'
 import { expect } from 'chai'
 import { shallow, mount } from 'enzyme'
@@ -6,6 +7,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Contact, { FormSection } from '../components/Contact'
 import { Button, Alert } from 'react-bootstrap'
+
+let mergeState = (component, newState) => {
+  component.setState(previousState => _.merge({}, previousState, newState))
+}
 
 describe('Initial values', () => {
   let wrapper = shallow(<Contact />)
@@ -72,13 +77,14 @@ describe('Output', () => {
 
 describe('Functions', () => {
   let wrapper = shallow(<Contact />)
-  let event = { target: { value: 'A new value' } }
 
   beforeEach(() => {
     wrapper = shallow(<Contact />)
   })
 
   describe('handleOnChange', () => {
+    let event = { target: { value: 'A new value' } }
+
     it('Updates the value for the input that was changed', () => {
       expect(wrapper.state().fields.name.value).to.equal('')
       wrapper.instance().handleOnChange(event, 'name')
@@ -188,6 +194,66 @@ describe('Functions', () => {
       it('returns true if the message is at least 5 chars long', () => {
         validate('message', 'hello').to.be.true
         validate('message', 'Testing is fun! :D').to.be.true
+      })
+    })
+  })
+
+  describe('formIsValid', () => {
+    // TODO: this shouldn't really be modifying the state. perhaps there should
+    // be a setFieldValidity function to handle that?
+    it('returns true or false', () => {
+      expect(wrapper.instance().formIsValid()).to.be.a('boolean')
+    })
+
+    it('it shows validation feedback for all fields', () => {
+      wrapper.instance().formIsValid()
+      expect(wrapper.instance().state.fields.name.showValidation).to.be.true
+      expect(wrapper.instance().state.fields.email.showValidation).to.be.true
+      expect(wrapper.instance().state.fields.message.showValidation).to.be.true
+    })
+
+    describe('when any fields are invalid', () => {
+      let instance = shallow(<Contact />).instance()
+      mergeState(instance, {
+        fields: {
+          name: { isValid: false },
+          email: { isValid: true },
+          message: { isValid: false }
+        }
+      })
+      let returnValue = instance.formIsValid()
+
+      it('returns false', () => {
+        expect(returnValue).to.be.false
+      })
+
+      it('shows the helpblock for the offending fields', () => {
+        // instance.formIsValid()
+        expect(instance.state.fields.name.showHelpBlock).to.be.true
+        expect(instance.state.fields.email.showHelpBlock).to.be.false
+        expect(instance.state.fields.message.showHelpBlock).to.be.true
+      })
+    })
+
+    describe('when all fields are valid', () => {
+      let instance = shallow(<Contact />).instance()
+      mergeState(instance, {
+        fields: {
+          name: { isValid: true },
+          email: { isValid: true },
+          message: { isValid: true }
+        }
+      })
+      let returnValue = instance.formIsValid()
+
+      it('returns true', () => {
+        expect(returnValue).to.be.true
+      })
+
+      it('does not show any helpblocks', () => {
+        expect(instance.state.fields.name.showHelpBlock).to.be.false
+        expect(instance.state.fields.email.showHelpBlock).to.be.false
+        expect(instance.state.fields.message.showHelpBlock).to.be.false
       })
     })
   })
