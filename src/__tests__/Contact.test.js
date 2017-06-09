@@ -167,5 +167,23 @@ describe('Functions', () => {
         validate('email', 'whatup+dog@gov.org.uk').to.be.true
       })
     })
+
+    describe('case: message', () => {
+      it('returns false if no message was given', () => {
+        validate('message', '').to.be.false
+        validate('message', null).to.be.false
+        validate('message', undefined).to.be.false
+      })
+
+      it('returns false if the message is less than 5 chars long', () => {
+        validate('message', 'welp').to.be.false
+        validate('message', ':-(').to.be.false
+      })
+
+      it('returns true if the message is at least 5 chars long', () => {
+        validate('message', 'hello').to.be.true
+        validate('message', 'Testing is fun! :D').to.be.true
+      })
+    })
   })
 })
