@@ -298,4 +298,42 @@ describe('Functions', () => {
       return expect(promise).to.eventually.be.false
     })
   })
+
+  describe('resetFormValidation', () => {
+    beforeEach(() => {
+      mergeState(wrapper, {
+        fields: {
+          email: {
+            isValid: false,
+            showHelpBlock: true,
+            showValidation: true
+          }
+        }
+      })
+    })
+
+    it('sets the validity of all fields to null', () => {
+      expect(wrapper.state('fields').email.isValid).to.be.false
+      wrapper.instance().resetFormValidation()
+      for (let field in wrapper.state('fields')) {
+        expect(wrapper.state('fields')[field].isValid).to.be.null
+      }
+    })
+
+    it('hides the helpblocks for all fields', () => {
+      expect(wrapper.state('fields').email.showHelpBlock).to.be.true
+      wrapper.instance().resetFormValidation()
+      for (let field in wrapper.state('fields')) {
+        expect(wrapper.state('fields')[field].showHelpBlock).to.be.false
+      }
+    })
+
+    it('hides the validation for all fields', () => {
+      expect(wrapper.state('fields').email.showValidation).to.be.true
+      wrapper.instance().resetFormValidation()
+      for (let field in wrapper.state('fields')) {
+        expect(wrapper.state('fields')[field].showValidation).to.be.false
+      }
+    })
+  })
 })
