@@ -175,7 +175,10 @@ export default class Contact extends Component {
       btnClass = 'hidden'
     } else if (status === 'danger') {
       alertText = 'Something went wrong. Please try again.'
+    } else {
+      throw new TypeError('showAlert called with invalid status')
     }
+
     this.setState({
       btnText: 'Send',
       btnClass: btnClass,

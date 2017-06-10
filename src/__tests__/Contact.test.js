@@ -336,4 +336,59 @@ describe('Functions', () => {
       }
     })
   })
+
+  describe('showAlert', () => {
+    it('sets the button text to "Send"', () => {
+      mergeState(wrapper, { btnText: 'Hello, world' })
+      wrapper.instance().showAlert('success')
+      expect(wrapper.state('btnText')).to.equal('Send')
+    })
+
+    it('shows the alert', () => {
+      wrapper.instance().showAlert('success')
+      expect(wrapper.state('showAlert')).to.be.true
+    })
+
+    it('sets the alert class to the given status', () => {
+      wrapper.instance().showAlert('success')
+      expect(wrapper.state('alertClass')).to.equal('success')
+    })
+
+    describe('when the given status is "success"', () => {
+      it('sets the alert text to "Your email has been sent :)"', () => {
+        let expectedText = 'Your email has been sent :)'
+        wrapper.instance().showAlert('success')
+        expect(wrapper.state('alertText')).to.equal(expectedText)
+      })
+
+      it('sets the button class to "hidden"', () => {
+        wrapper.instance().showAlert('success')
+        expect(wrapper.state('btnClass')).to.equal('hidden')
+      })
+    })
+
+    describe('when the given status is "danger"', () => {
+      it('sets the alert text to "Something went wrong. Please try again."', () => {
+        let expectedText = 'Something went wrong. Please try again.'
+        wrapper.instance().showAlert('danger')
+        expect(wrapper.state('alertText')).to.equal(expectedText)
+      })
+
+      it('sets the button class to ""', () => {
+        mergeState(wrapper, { btnClass: 'hidden' })
+        wrapper.instance().showAlert('danger')
+        expect(wrapper.state('btnClass')).to.equal('')
+      })
+    })
+
+    describe('when status is neither "danger" nor "success"', () => {
+      it('throws an error', () => {
+        expect(wrapper.instance().showAlert).to.throw(TypeError, 'status')
+        let testWithArg = () => {
+          wrapper.instance().showAlert('hello')
+        }
+        expect(testWithArg).to.throw(TypeError, 'status')
+      })
+    })
+  })
 })
