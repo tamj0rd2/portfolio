@@ -209,6 +209,8 @@ export default class Contact extends Component {
         }
         return emailSent
       })
+    } else {
+      return Promise.resolve(false)
     }
   }
 

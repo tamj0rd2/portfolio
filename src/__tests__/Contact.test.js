@@ -391,4 +391,87 @@ describe('Functions', () => {
       })
     })
   })
+
+  describe('handleSubmit', () => {
+    let wrapper, formIsValid, sendEmail, resetFormV, showAlert, promise
+    let event = { preventDefault() {} }
+
+    beforeEach(() => {
+      formIsValid = sinon.stub(Contact.prototype, 'formIsValid')
+      sendEmail = sinon.stub(Contact.prototype, 'sendEmail')
+      resetFormV = sinon.stub(Contact.prototype, 'resetFormValidation')
+      showAlert = sinon.stub(Contact.prototype, 'showAlert')
+      wrapper = shallow(<Contact />)
+    })
+
+    afterEach(() => {
+      formIsValid.restore()
+      sendEmail.restore()
+      resetFormV.restore()
+      showAlert.restore()
+      promise = null
+    })
+
+    it('prevents the page from reloading on submit', () => {
+      let preventDefault = sinon.stub(event, 'preventDefault')
+      wrapper.instance().handleSubmit(event)
+      expect(preventDefault.calledOnce).to.be.true
+    })
+
+    describe('if the form is valid', () => {
+      beforeEach(() => {
+        formIsValid.returns(true)
+      })
+
+      describe('if the email was sent successfully', () => {
+        beforeEach(() => {
+          sendEmail.resolves(true)
+          promise = wrapper.instance().handleSubmit(event)
+        })
+
+        it('resolves to true', () => {
+          return expect(promise).to.eventually.be.true
+        })
+
+        it('calls resetFormValidation', () => {
+          return expect(promise).to.be.fulfilled.then(() => {
+            expect(resetFormV.calledOnce).to.be.true
+          })
+        })
+
+        it('calls showAlert with the arg "success', () => {
+          return expect(promise).to.be.fulfilled.then(() => {
+            expect(showAlert.calledOnce).to.be.true
+            expect(showAlert.calledWith('success')).to.be.true
+          })
+        })
+      })
+
+      describe('if the email was not sent successfully', () => {
+        beforeEach(() => {
+          sendEmail.resolves(false)
+          promise = wrapper.instance().handleSubmit(event)
+        })
+
+        it('resolves to false', () => {
+          expect(promise).to.eventually.equal(false)
+        })
+
+        it('calls showAlert with the arg "danger"', () => {
+          sendEmail.resolves(false)
+          return expect(promise).to.be.fulfilled.then(() => {
+            expect(showAlert.calledOnce).to.be.true
+          })
+        })
+      })
+    })
+
+    describe('if the form is invalid', () => {
+      it('resolves to false', () => {
+        formIsValid.returns(false)
+        promise = wrapper.instance().handleSubmit(event)
+        return expect(promise).to.eventually.be.false
+      })
+    })
+  })
 })
