@@ -134,3 +134,14 @@ describe('Functions', () => {
     })
   })
 })
+
+describe('Events', () => {
+  describe('When the value of the FormControl is changed', () => {
+    it('triggers the onChange function', () => {
+      let onChange = sinon.stub(FormSection.prototype, 'onChange')
+      let wrapper = shallow(<FormSection {...props} />)
+      wrapper.find('FormControl').simulate('change')
+      expect(onChange.calledOnce).to.be.true
+    })
+  })
+})
