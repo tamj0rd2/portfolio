@@ -95,3 +95,27 @@ describe('Initial values', () => {
     })
   })
 })
+
+describe('Output', () => {
+  let wrapper = shallow(<FormSection {...props} />)
+
+  it('outputs 1 FormGroup', () => {
+    expect(wrapper.find('FormGroup').length).to.equal(1)
+  })
+
+  it('outputs 1 ControlLabel', () => {
+    expect(wrapper.find('ControlLabel').length).to.equal(1)
+  })
+
+  it('outputs 1 FormControl', () => {
+    expect(wrapper.find('FormControl').length).to.equal(1)
+  })
+
+  it('outputs 1 Feedback', () => {
+    expect(wrapper.find('FormControlFeedback').length).to.equal(1)
+  })
+
+  it('outputs 1 HelpBlock', () => {
+    expect(wrapper.find('HelpBlock').length).to.equal(1)
+  })
+})
