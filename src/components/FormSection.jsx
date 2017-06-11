@@ -7,9 +7,19 @@ import {
   HelpBlock
 } from 'react-bootstrap'
 
+// When creating a form item, we pass it the parent's state so that we can
+// programatically set the state for the correct item during the onchange
+
 export default class FormSection extends Component {
-  // When creating a form item, we pass it the parent's state so that we can
-  // programatically set the state for the correct item during the onchange
+  constructor(props) {
+    super(props)
+    this.onChange = this.onChange.bind(this)
+  }
+
+  onChange(e) {
+    this.props.onChange(e, this.props.identifier)
+  }
+
   render() {
     let state = this.props.parentState[this.props.identifier]
     let validationState = null
@@ -26,7 +36,7 @@ export default class FormSection extends Component {
           componentClass={this.props.componentClass}
           type={this.props.inputType}
           value={state.value}
-          onChange={e => this.props.onChange(e, this.props.identifier)}
+          onChange={this.onChange}
         />
         <FormControl.Feedback />
         <HelpBlock className={state.showHelpBlock ? '' : 'hidden'}>
@@ -36,10 +46,12 @@ export default class FormSection extends Component {
     )
   }
 }
+
 FormSection.defaultProps = {
   componentClass: 'input',
   inputType: null
 }
+
 FormSection.propTypes = {
   labelText: PropTypes.string.isRequired,
   identifier: PropTypes.string.isRequired,

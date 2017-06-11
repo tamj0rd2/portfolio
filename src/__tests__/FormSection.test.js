@@ -119,3 +119,18 @@ describe('Output', () => {
     expect(wrapper.find('HelpBlock').length).to.equal(1)
   })
 })
+
+describe('Functions', () => {
+  describe('onChange', () => {
+    it('calls the onChange prop with an event and identifier', () => {
+      let onChangeProp = sinon.stub()
+      let givenProps = _.merge({}, props, { onChange: onChangeProp })
+      let wrapper = shallow(<FormSection {...givenProps} />)
+      let event = new Event('change')
+
+      wrapper.instance().onChange(event)
+      expect(onChangeProp.calledOnce).to.be.true
+      expect(onChangeProp.calledWithExactly(event, 'fieldname')).to.be.true
+    })
+  })
+})
