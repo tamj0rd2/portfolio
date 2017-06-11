@@ -5,8 +5,7 @@ import chaiAsPromised from 'chai-as-promised'
 import { shallow } from 'enzyme'
 
 import React from 'react'
-import Contact, { FormSection } from '../components/Contact'
-import { Button, Alert } from 'react-bootstrap'
+import Contact from '../components/Contact'
 
 chai.use(chaiAsPromised)
 
@@ -65,15 +64,15 @@ describe('Output', () => {
   })
 
   it('contains 3 FormSections', () => {
-    expect(wrapper.find(FormSection)).to.have.length(3)
+    expect(wrapper.find('FormSection')).to.have.length(3)
   })
 
   it('contains a submit button', () => {
-    expect(wrapper.find(Button)).to.have.length(1)
+    expect(wrapper.find('Button')).to.have.length(1)
   })
 
   it('contains an alert', () => {
-    expect(wrapper.find(Alert)).to.have.length(1)
+    expect(wrapper.find('Alert')).to.have.length(1)
   })
 })
 
