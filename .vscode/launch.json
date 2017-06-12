@@ -10,10 +10,11 @@
         "--debug-brk",
         "--nolazy"
       ],
-      "program": "${workspaceRoot}/node_modules/react-scripts/node_modules/jest/bin/jest.js",
+      "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
       "args": [
         "--runInBand",
-        "--env=jsdom"
+        "--env=jsdom",
+        "--config=${fileDirname}/jest-config.json"
       ],
       "cwd": "${workspaceRoot}",
       "skipFiles": [

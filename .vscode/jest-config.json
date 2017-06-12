@@ -1,0 +1,11 @@
+{
+  "rootDir": "../src",
+  "setupFiles": [
+    "../node_modules/react-scripts/config/polyfills.js"
+  ],
+  "transform": {
+    "^.+\\.(js|jsx)$": "../node_modules/react-scripts/config/jest/babelTransform.js",
+    "^.+\\.(css|scss)$": "../node_modules/react-scripts/config/jest/cssTransform.js",
+    "^(?!.*\\.(js|jsx|css|json)$)": "../node_modules/react-scripts/config/jest/fileTransform.js"
+  }
+}
