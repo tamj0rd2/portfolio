@@ -12,7 +12,8 @@ let props = {
   helpText: 'You did something wrong',
   parentState: {
     fieldname: {
-      showValidation: false
+      showValidation: false,
+      isValid: false
     }
   },
   onChange: () => {}
@@ -131,6 +132,37 @@ describe('Functions', () => {
       wrapper.instance().onChange(event)
       expect(onChangeProp.calledOnce).to.be.true
       expect(onChangeProp.calledWithExactly(event, 'fieldname')).to.be.true
+    })
+  })
+
+  describe('getValidationState', () => {
+    describe('when validation should not be shown', () => {
+      it('returns null', () => {
+        let wrapper = shallow(<FormSection {...props} />)
+        expect(wrapper.instance().getValidationState()).to.be.null
+      })
+    })
+
+    describe('when validation should be shown', () => {
+      it('returns "success" if the field value is valid', () => {
+        let givenProps = _.merge({}, props, {
+          parentState: {
+            fieldname: { showValidation: true, isValid: true }
+          }
+        })
+        let wrapper = shallow(<FormSection {...givenProps} />)
+        expect(wrapper.instance().getValidationState()).to.equal('success')
+      })
+
+      it('returns "error" if the field value is invalid', () => {
+        let givenProps = _.merge({}, props, {
+          parentState: {
+            fieldname: { showValidation: true, isValid: false }
+          }
+        })
+        let wrapper = shallow(<FormSection {...givenProps} />)
+        expect(wrapper.instance().getValidationState()).to.equal('error')
+      })
     })
   })
 })

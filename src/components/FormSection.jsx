@@ -14,6 +14,16 @@ export default class FormSection extends Component {
   constructor(props) {
     super(props)
     this.onChange = this.onChange.bind(this)
+    this.getValidationState = this.getValidationState.bind(this)
+  }
+
+  getValidationState() {
+    let state = this.props.parentState[this.props.identifier]
+    if (state.showValidation) {
+      if (state.isValid) return 'success'
+      else return 'error'
+    }
+    return null
   }
 
   onChange(e) {
@@ -22,12 +32,7 @@ export default class FormSection extends Component {
 
   render() {
     let state = this.props.parentState[this.props.identifier]
-    let validationState = null
-
-    if (state.showValidation) {
-      if (state.isValid) validationState = 'success'
-      else validationState = 'error'
-    }
+    let validationState = this.getValidationState()
 
     return (
       <FormGroup validationState={validationState}>
