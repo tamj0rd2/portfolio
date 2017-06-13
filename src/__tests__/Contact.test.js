@@ -74,6 +74,41 @@ describe('Output', () => {
   it('contains an alert', () => {
     expect(wrapper.find('Alert')).to.have.length(1)
   })
+
+  describe('Alert', () => {
+    describe('when showAlert is true', () => {
+      it('is shown', () => {
+        wrapper.setState({ showAlert: true })
+        expect(wrapper.find('Alert').prop('className')).to.equal('')
+      })
+    })
+
+    describe('when showAlert is false', () => {
+      it('is hidden', () => {
+        wrapper.setState({ showAlert: false })
+        expect(wrapper.find('Alert').prop('className')).to.equal('hidden')
+      })
+    })
+
+    describe('when alertClass is "success"', () => {
+      it('should have the text "Success!"', () => {
+        wrapper.setState({ alertClass: 'success' })
+        let alertHeader = wrapper.find('Alert').find('strong')
+        expect(alertHeader.text()).to.equal('Success!')
+      })
+    })
+
+    describe('when alertClass is not "success"', () => {
+      it('should have the text "Oops!"', () => {
+        ['danger', null, undefined].forEach(alertClass => {
+          let wrapper = shallow(<Contact />)
+          wrapper.setState({ alertClass })
+          let alertHeader = wrapper.find('Alert').find('strong')
+          expect(alertHeader.text()).to.equal('Oops!')
+        })
+      })
+    })
+  })
 })
 
 describe('Functions', () => {
