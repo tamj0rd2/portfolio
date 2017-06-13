@@ -119,6 +119,28 @@ describe('Output', () => {
   it('outputs 1 HelpBlock', () => {
     expect(wrapper.find('HelpBlock').length).to.equal(1)
   })
+
+  describe('HelpBlock', () => {
+    describe('when showHelpBlock is true', () => {
+      it('should be displayed', () => {
+        let parentState = _.merge({}, props.parentState, {
+          fieldname: { showHelpBlock: true }
+        })
+        wrapper.setProps({ parentState })
+        expect(wrapper.find('HelpBlock').prop('className')).to.equal('')
+      })
+    })
+
+    describe('when showHelpBlock is false', () => {
+      it('should be hidden', () => {
+        let parentState = _.merge({}, props.parentState, {
+          fieldname: { showHelpBlock: false }
+        })
+        wrapper.setProps({ parentState })
+        expect(wrapper.find('HelpBlock').prop('className')).to.equal('hidden')
+      })
+    })
+  })
 })
 
 describe('Functions', () => {
