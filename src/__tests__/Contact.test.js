@@ -71,6 +71,22 @@ describe('Output', () => {
     expect(wrapper.find('Button')).to.have.length(1)
   })
 
+  describe('Button', () => {
+    describe('when btnText is "Sending..."', () => {
+      it('should be disabled', () => {
+        wrapper.setState({ btnText: 'Sending...' })
+        expect(wrapper.find('Button').prop('disabled')).to.be.true
+      })
+    })
+
+    describe('when btnText is not "Sending..."', () => {
+      it('should be enabled', () => {
+        wrapper.setState({ btnText: 'Hello, world!' })
+        expect(wrapper.find('Button').prop('disabled')).to.be.false
+      })
+    })
+  })
+
   it('contains an alert', () => {
     expect(wrapper.find('Alert')).to.have.length(1)
   })
