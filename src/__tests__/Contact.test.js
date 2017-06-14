@@ -13,6 +13,8 @@ let mergeState = (component, newState) => {
   component.setState(previousState => _.merge({}, previousState, newState))
 }
 
+let expectedFields = ['name', 'email', 'message']
+
 describe('Initial values', () => {
   let wrapper = shallow(<Contact />)
 
@@ -29,7 +31,6 @@ describe('Initial values', () => {
   describe('State', () => {
     it('has the correct base state', () => {
       let state = wrapper.state()
-      let expectedFields = ['name', 'email', 'message']
 
       expect(state.btnText).to.equal('Send')
       // TODO: should probably be changed to showBtn?
@@ -37,21 +38,28 @@ describe('Initial values', () => {
       expect(state.alertText).to.equal('')
       expect(state.alertClass).to.be.null
       expect(state.showAlert).to.be.false
-
-      expect(state).to.have.property('fields')
-      expect(Object.keys(state.fields)).to.have.length(3)
-      expect(Object.keys(state.fields)).to.have.same.members(expectedFields)
+      expect(state).to.be.an('object')
     })
 
-    it('has the correct state for each field', () => {
-      let state = wrapper.state().fields
-      for (let field in state) {
-        expect(state[field].value).to.equal('')
-        expect(state[field].isValid).to.be.null
-        // TODO: should probably be changed to showFeedback
-        expect(state[field].showValidation).to.be.false
-        expect(state[field].showHelpBlock).to.be.false
-      }
+    describe('fields', () => {
+      it('has an object for name, email and message', () => {
+        let state = wrapper.state().fields
+
+        expectedFields.forEach(fieldName =>
+          expect(state[fieldName]).to.be.an('object')
+        )
+      })
+
+      it('has the correct state for name, email and message', () => {
+        let state = wrapper.state().fields
+        for (let field in state) {
+          expect(state[field].value).to.equal('')
+          expect(state[field].isValid).to.be.null
+          // TODO: should probably be changed to showFeedback
+          expect(state[field].showValidation).to.be.false
+          expect(state[field].showHelpBlock).to.be.false
+        }
+      })
     })
   })
 })
@@ -74,14 +82,14 @@ describe('Output', () => {
   describe('Button', () => {
     describe('when btnText is "Sending..."', () => {
       it('should be disabled', () => {
-        wrapper.setState({ btnText: 'Sending...' })
+        mergeState(wrapper, { btnText: 'Sending...' })
         expect(wrapper.find('Button').prop('disabled')).to.be.true
       })
     })
 
     describe('when btnText is not "Sending..."', () => {
       it('should be enabled', () => {
-        wrapper.setState({ btnText: 'Hello, world!' })
+        mergeState(wrapper, { btnText: 'Hello, world!' })
         expect(wrapper.find('Button').prop('disabled')).to.be.false
       })
     })
@@ -94,33 +102,32 @@ describe('Output', () => {
   describe('Alert', () => {
     describe('when showAlert is true', () => {
       it('is shown', () => {
-        wrapper.setState({ showAlert: true })
+        mergeState(wrapper, { showAlert: true })
         expect(wrapper.find('Alert').prop('className')).to.equal('')
       })
     })
 
     describe('when showAlert is false', () => {
       it('is hidden', () => {
-        wrapper.setState({ showAlert: false })
+        mergeState(wrapper, { showAlert: false })
         expect(wrapper.find('Alert').prop('className')).to.equal('hidden')
       })
     })
 
     describe('when alertClass is "success"', () => {
       it('should have the text "Success!"', () => {
-        wrapper.setState({ alertClass: 'success' })
-        let alertHeader = wrapper.find('Alert').find('strong')
-        expect(alertHeader.text()).to.equal('Success!')
+        mergeState(wrapper, { alertClass: 'success' })
+        let alertHeaderText = wrapper.find('Alert').find('strong').text()
+        expect(alertHeaderText).to.equal('Success!')
       })
     })
 
     describe('when alertClass is not "success"', () => {
       it('should have the text "Oops!"', () => {
         ['danger', null, undefined].forEach(alertClass => {
-          let wrapper = shallow(<Contact />)
-          wrapper.setState({ alertClass })
-          let alertHeader = wrapper.find('Alert').find('strong')
-          expect(alertHeader.text()).to.equal('Oops!')
+          mergeState(wrapper, { alertClass })
+          let alertHeaderText = wrapper.find('Alert').find('strong').text()
+          expect(alertHeaderText).to.equal('Oops!')
         })
       })
     })
@@ -142,114 +149,133 @@ describe('Functions', () => {
     let event = { target: { value: 'A new value' } }
 
     it('Updates the value for the input that was changed', () => {
-      expect(wrapper.state().fields.name.value).to.equal('')
       wrapper.instance().handleOnChange(event, 'name')
       expect(wrapper.state().fields.name.value).to.equal('A new value')
     })
 
     it('Marks whether or not the new input value is valid', () => {
-      expect(wrapper.state().fields.name.isValid).to.be.null
       wrapper.instance().handleOnChange(event, 'name')
       expect(wrapper.state().fields.name.isValid).to.be.a('boolean')
     })
 
     it('Hides any validation feedback that was on the FormGroup', () => {
-      wrapper.setState({ fields: { name: { showValidation: true } } })
-      expect(wrapper.state().fields.name.showValidation).to.be.true
+      mergeState(wrapper, { fields: { name: { showValidation: true } } })
+
       wrapper.instance().handleOnChange(event, 'name')
       expect(wrapper.state().fields.name.showValidation).to.be.false
     })
   })
 
   describe('isValid', () => {
-    let validate = (validatorName, newValue) => {
-      return expect(wrapper.instance().isValid(validatorName, newValue))
+    let expectIsValid = (validatorName, newValue) => {
+      let msg = `Validator: "${validatorName}". Value: "${newValue}"`
+      return expect(wrapper.instance().isValid(validatorName, newValue), msg)
     }
 
     it('returns true or false', () => {
-      validate().to.be.a('boolean')
+      expectIsValid().to.be.a('boolean')
     })
 
     it('returns false for unknown validators', () => {
-      validate('hello', 'Some Value').to.be.false
-      validate('world', 'another@value.net').to.be.false
-      validate('!', 'Yet another value!').to.be.false
+      let unknownValidators = ['hello', 'world', '!']
+      unknownValidators.forEach(val => expectIsValid(val, '').to.be.false)
     })
 
     describe('validator: name', () => {
+      let nameIsValid = nameToTest => {
+        return expectIsValid('name', nameToTest)
+      }
+
       it('returns false if a name is not given', () => {
-        validate('name', '').to.be.false
-        validate('name', null).to.be.false
-        validate('name', undefined).to.be.false
+        let blankNames = ['', null, undefined]
+        blankNames.forEach(name => nameIsValid(name).to.be.false)
       })
 
       it('returns false if the name is less than 3 characters long', () => {
-        validate('name', 'ab').to.be.false
-        validate('name', '').to.be.false
+        let shortNames = ['ab', '']
+        shortNames.forEach(name => nameIsValid(name).to.be.false)
       })
 
       it('returns false if the name is more than 50 characters long', () => {
         let longName = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        validate('name', longName).to.be.false
+        nameIsValid(longName).to.be.false
       })
 
       it('returns false if symbols other than spaces and ._- are found', () => {
-        validate('name', 'Hello!').to.be.false
-        validate('name', 'Hello &$%').to.be.false
-        validate('name', 'Hello world!').to.be.false
-        validate('name', 'Hello, world').to.be.false
-        validate('name', 'yo whatup =)').to.be.false
+        let badNames = [
+          'Hello!',
+          'Hello &$%',
+          'Hello world!',
+          'Hello, world',
+          'yo whatup =)'
+        ]
+        badNames.forEach(name => nameIsValid(name).to.be.false)
       })
 
       it('returns true if none of the above conditions are met', () => {
         let longName = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        validate('name', longName).to.be.true
-        validate('name', 'tamj0rd2').to.be.true
-        validate('name', 'jim.bob').to.be.true
-        validate('name', '-_-').to.be.true
-        validate('name', 'yo whatup').to.be.true
-        validate('name', 'John_Doe').to.be.true
-        validate('name', 'Sue').to.be.true
+        let goodNames = [
+          longName,
+          'tamj0rd2',
+          'jim.bob',
+          '-_-',
+          'yo whatup',
+          'John_Doe',
+          'Sue'
+        ]
+        goodNames.forEach(name => nameIsValid(name).to.be.true)
       })
     })
 
     describe('validator: email', () => {
+      let emailIsValid = emailToTest => {
+        return expectIsValid('email', emailToTest)
+      }
+
       it('returns false if no email is given', () => {
-        validate('email', '').to.be.false
-        validate('email', null).to.be.false
-        validate('email', undefined).to.be.false
+        let blankEmails = ['', null, undefined]
+        blankEmails.forEach(email => emailIsValid(email).to.be.false)
       })
 
       it('returns false if the email address is not valid', () => {
-        validate('email', 'hello, world').to.be.false
-        validate('email', 'hello@world').to.be.false
-        validate('email', 'hello@world.z').to.be.false
-        validate('email', 'hello@world!.com').to.be.false
+        let badEmails = [
+          'hello, world',
+          'hello@world',
+          'hello@world.z',
+          'hello@world!.com'
+        ]
+        badEmails.forEach(email => emailIsValid(email).to.be.false)
       })
 
       it('returns true if the email address is valid', () => {
-        validate('email', 'a@b.com').to.be.true
-        validate('email', 'hello@world.xyz').to.be.true
-        validate('email', 'hello-world!@something.com').to.be.true
-        validate('email', 'whatup+dog@gov.org.uk').to.be.true
+        let validEmails = [
+          'a@b.com',
+          'hello@world.xyz',
+          'hello-world!@something.com',
+          'whatup+dog@gov.org.uk'
+        ]
+        validEmails.forEach(email => emailIsValid(email).to.be.true)
       })
     })
 
     describe('validator: message', () => {
+      let msgIsValid = messageToTest => {
+        return expectIsValid('message', messageToTest)
+      }
+
       it('returns false if no message was given', () => {
-        validate('message', '').to.be.false
-        validate('message', null).to.be.false
-        validate('message', undefined).to.be.false
+        let blankMsgs = ['', null, undefined]
+        blankMsgs.forEach(msg => msgIsValid(msg).to.be.false)
       })
 
       it('returns false if the message is less than 5 chars long', () => {
-        validate('message', 'welp').to.be.false
-        validate('message', ':-(').to.be.false
+        let shortMsgs = ['Welp', ':-(', ':<']
+        shortMsgs.forEach(msg => msgIsValid(msg).to.be.false)
       })
 
       it('returns true if the message is at least 5 chars long', () => {
-        validate('message', 'hello').to.be.true
-        validate('message', 'Testing is fun! :D').to.be.true
+        let goodMsgs = ['hello', 'Testing is fun! :D']
+        goodMsgs.forEach(msg => msgIsValid(msg).to.be.true)
       })
     })
   })
@@ -263,9 +289,10 @@ describe('Functions', () => {
 
     it('it shows validation feedback for all fields', () => {
       wrapper.instance().formIsValid()
-      expect(wrapper.instance().state.fields.name.showValidation).to.be.true
-      expect(wrapper.instance().state.fields.email.showValidation).to.be.true
-      expect(wrapper.instance().state.fields.message.showValidation).to.be.true
+      let newFieldVals = wrapper.state('fields')
+      expectedFields.forEach(
+        field => expect(newFieldVals[field].showValidation).to.be.true
+      )
     })
 
     describe('when any fields are invalid', () => {
@@ -360,29 +387,28 @@ describe('Functions', () => {
           }
         }
       })
+      wrapper.instance().resetFormValidation()
     })
 
+    let expectFieldState = (field, propToTest) => {
+      return expect(wrapper.state('fields')[field][propToTest])
+    }
+
     it('sets the validity of all fields to null', () => {
-      expect(wrapper.state('fields').email.isValid).to.be.false
-      wrapper.instance().resetFormValidation()
       for (let field in wrapper.state('fields')) {
-        expect(wrapper.state('fields')[field].isValid).to.be.null
+        expectFieldState(field, 'isValid').to.be.null
       }
     })
 
     it('hides the helpblocks for all fields', () => {
-      expect(wrapper.state('fields').email.showHelpBlock).to.be.true
-      wrapper.instance().resetFormValidation()
       for (let field in wrapper.state('fields')) {
-        expect(wrapper.state('fields')[field].showHelpBlock).to.be.false
+        expectFieldState(field, 'showHelpBlock').to.be.false
       }
     })
 
     it('hides the validation for all fields', () => {
-      expect(wrapper.state('fields').email.showValidation).to.be.true
-      wrapper.instance().resetFormValidation()
       for (let field in wrapper.state('fields')) {
-        expect(wrapper.state('fields')[field].showValidation).to.be.false
+        expectFieldState(field, 'showValidation').to.be.false
       }
     })
   })
