@@ -2,9 +2,12 @@ language: node_js
 node_js:
   - 6
 cache: yarn
+before_script:
+  - yarn add codecov -D
 script:
   - yarn run test:codestyle
-  - yarn run test
+  - yarn run test:coverage
+  - codecov
   - yarn run build
 deploy:
   provider: pages
