@@ -32,7 +32,7 @@ export default class Contact extends Component {
       state.fields[identifier] = {
         value: '',
         isValid: null,
-        showValidation: false,
+        showFeedback: false,
         showHelpBlock: false
       }
     })
@@ -46,8 +46,8 @@ export default class Contact extends Component {
     newState[identifier].value = e.target.value
     newState[identifier].isValid = this.isValid(identifier, e.target.value)
 
-    // the value changed so hide validation until the next form submission
-    newState[identifier].showValidation = false
+    // the value changed so hide feedback until the next form submission
+    newState[identifier].showFeedback = false
     this.setState({ fields: newState })
   }
 
@@ -70,11 +70,11 @@ export default class Contact extends Component {
   formIsValid() {
     let noErrorsFound = true
 
-    // show validation for each FormSection, since we've submitted the form now
     let newState = R.clone(this.state.fields)
 
     for (let identifier in newState) {
-      newState[identifier].showValidation = true
+      // show feedback for all fields now that the form has been submitted
+      newState[identifier].showFeedback = true
       // only show help block for invalid FormSections
       let isValid = newState[identifier].isValid
       if (!isValid) noErrorsFound = false
@@ -111,7 +111,7 @@ export default class Contact extends Component {
     for (let identifier in newState) {
       newState[identifier].isValid = null
       newState[identifier].showHelpBlock = false
-      newState[identifier].showValidation = false
+      newState[identifier].showFeedback = false
     }
 
     this.setState({ fields: newState })

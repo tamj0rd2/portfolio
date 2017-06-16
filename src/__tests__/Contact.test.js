@@ -54,8 +54,7 @@ describe('Initial values', () => {
         for (let field in state) {
           expect(state[field].value).to.equal('')
           expect(state[field].isValid).to.be.null
-          // TODO: should probably be changed to showFeedback
-          expect(state[field].showValidation).to.be.false
+          expect(state[field].showFeedback).to.be.false
           expect(state[field].showHelpBlock).to.be.false
         }
       })
@@ -174,11 +173,11 @@ describe('Functions', () => {
       expect(wrapper.state().fields.name.isValid).to.be.a('boolean')
     })
 
-    it('Hides any validation feedback that was on the FormGroup', () => {
-      mergeState(wrapper, { fields: { name: { showValidation: true } } })
+    it('Hides any feedback that was on the FormGroup', () => {
+      mergeState(wrapper, { fields: { name: { showFeedback: true } } })
 
       wrapper.instance().handleOnChange(event, 'name')
-      expect(wrapper.state().fields.name.showValidation).to.be.false
+      expect(wrapper.state().fields.name.showFeedback).to.be.false
     })
   })
 
@@ -303,11 +302,11 @@ describe('Functions', () => {
       expect(wrapper.instance().formIsValid()).to.be.a('boolean')
     })
 
-    it('it shows validation feedback for all fields', () => {
+    it('it shows feedback for all fields', () => {
       wrapper.instance().formIsValid()
       let newFieldVals = wrapper.state('fields')
       expectedFields.forEach(
-        field => expect(newFieldVals[field].showValidation).to.be.true
+        field => expect(newFieldVals[field].showFeedback).to.be.true
       )
     })
 
@@ -399,7 +398,7 @@ describe('Functions', () => {
           email: {
             isValid: false,
             showHelpBlock: true,
-            showValidation: true
+            showFeedback: true
           }
         }
       })
@@ -424,7 +423,7 @@ describe('Functions', () => {
 
     it('hides the validation for all fields', () => {
       for (let field in wrapper.state('fields')) {
-        expectFieldState(field, 'showValidation').to.be.false
+        expectFieldState(field, 'showFeedback').to.be.false
       }
     })
   })
