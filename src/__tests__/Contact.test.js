@@ -179,7 +179,7 @@ describe('Functions', () => {
 
     it('returns false for unknown validators', () => {
       let unknownValidators = ['hello', 'world', '!']
-      unknownValidators.forEach(val => expectIsValid(val, '').to.be.false)
+      unknownValidators.forEach(val => expectIsValid(val, 'abc').to.be.false)
     })
 
     describe('validator: name', () => {
