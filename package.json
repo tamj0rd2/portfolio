@@ -33,12 +33,21 @@
     "enzyme": "^2.8.2",
     "fetch-mock": "^5.11.0",
     "gh-pages": "^1.0.0",
+    "husky": "^0.13.4",
+    "lint-staged": "^3.6.1",
     "prettier-eslint": "^6.2.3",
     "react-scripts": "1.0.7",
     "react-test-renderer": "^15.5.4",
     "sinon": "^2.3.2"
   },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "yarn run test:codestyle"
+    ]
+  },
   "scripts": {
+    "precommit": "lint-staged",
+    "prepush": "CI=true yarn run test:coverage",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
