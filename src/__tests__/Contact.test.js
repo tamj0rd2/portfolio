@@ -124,7 +124,8 @@ describe('Output', () => {
 
     describe('when alertClass is not "success"', () => {
       it('should have the text "Oops!"', () => {
-        ['danger', null, undefined].forEach(alertClass => {
+        let failureClasses = ['danger', null, undefined]
+        failureClasses.forEach(alertClass => {
           mergeState(wrapper, { alertClass })
           let alertHeaderText = wrapper.find('Alert').find('strong').text()
           expect(alertHeaderText).to.equal('Oops!')

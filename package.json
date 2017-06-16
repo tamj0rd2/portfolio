@@ -5,6 +5,7 @@
   "dependencies": {
     "bootstrap": "^3.3.7",
     "lodash": "^4.17.4",
+    "prettier-eslint-cli": "^4.1.1",
     "prop-types": "^15.5.10",
     "ramda": "^0.24.1",
     "react": "^15.5.4",
@@ -42,6 +43,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "test:coverage": "react-scripts test --env=jsdom --coverage \"--collectCoverageFrom=src/**/*.{js|jsx}\" \"--collectCoverageFrom=!src/{registerServiceWorker|index}.js\"",
+    "test:codestyle": "prettier-eslint \"./src/**/*.{js,jsx}\" --list-different",
+    "format": "prettier-eslint \"./src/**/*.{js,jsx}\" --write",
     "eject": "react-scripts eject",
     "predeploy": "git add --all && git stash -u && npm run build",
     "deploy": "gh-pages -d build -b master -r git@github.com:tamj0rd2/tamj0rd2.github.io.git",

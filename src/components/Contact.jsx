@@ -24,9 +24,11 @@ export default class Contact extends Component {
       alertClass: null,
       showAlert: false,
       fields: {}
-    };
+    }
 
-    ['name', 'email', 'message'].forEach(identifier => {
+    let fieldNames = ['name', 'email', 'message']
+
+    fieldNames.forEach(identifier => {
       state.fields[identifier] = {
         value: '',
         isValid: null,
