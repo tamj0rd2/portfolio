@@ -1,0 +1,17 @@
+language: node_js
+node_js:
+  - 6
+cache: yarn
+script:
+  - yarn run test:codestyle
+  - yarn run test
+  - yarn run build
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  repo: tamj0rd2/tamj0rd2.github.io
+  target_branch: master
+  project_name: tamj0rd2.github.io
+  on:
+    branch: master
