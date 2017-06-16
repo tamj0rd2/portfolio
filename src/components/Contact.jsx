@@ -68,8 +68,7 @@ export default class Contact extends Component {
   }
 
   formIsValid() {
-    let noErrorsFound = true
-
+    let errorsFound = 0
     let newState = R.clone(this.state.fields)
 
     for (let identifier in newState) {
@@ -77,11 +76,12 @@ export default class Contact extends Component {
       newState[identifier].showFeedback = true
       // only show help block for invalid FormSections
       let isValid = newState[identifier].isValid
-      if (!isValid) noErrorsFound = false
+      if (isValid === false) errorsFound += 1
+      // if the field is valid don't show the help block, and vice versa
       newState[identifier].showHelpBlock = !isValid
     }
     this.setState({ fields: newState })
-    return noErrorsFound
+    return errorsFound === 0
   }
 
   sendEmail() {
