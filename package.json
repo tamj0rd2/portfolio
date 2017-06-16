@@ -46,7 +46,7 @@
     "test:codestyle": "prettier-eslint \"./src/**/*.{js,jsx}\" --list-different",
     "format": "prettier-eslint \"./src/**/*.{js,jsx}\" --write",
     "eject": "react-scripts eject",
-    "predeploy": "git add --all && git stash -u && npm run build",
+    "predeploy": "git add --all && git stash -u && yarn run build",
     "deploy": "gh-pages -d build -b master -r git@github.com:tamj0rd2/tamj0rd2.github.io.git",
     "postdeploy": "git stash pop"
   },
