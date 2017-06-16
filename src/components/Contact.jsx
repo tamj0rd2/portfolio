@@ -19,7 +19,7 @@ export default class Contact extends Component {
 
     let state = {
       btnText: 'Send',
-      btnClass: true,
+      showBtn: true,
       alertText: '',
       alertClass: null,
       showAlert: false,
@@ -118,21 +118,21 @@ export default class Contact extends Component {
   }
 
   showAlert(status) {
-    let alertText = ''
-    let btnClass = ''
+    let alertText, showBtn
 
     if (status === 'success') {
       alertText = 'Your email has been sent :)'
-      btnClass = 'hidden'
+      showBtn = false
     } else if (status === 'danger') {
       alertText = 'Something went wrong. Please try again.'
+      showBtn = true
     } else {
       throw new TypeError('showAlert called with invalid status')
     }
 
     this.setState({
       btnText: 'Send',
-      btnClass: btnClass,
+      showBtn: showBtn,
       showAlert: true,
       alertClass: status,
       alertText: alertText
@@ -210,7 +210,7 @@ export default class Contact extends Component {
 
             <Button
               type="submit"
-              className={`btn-primary ${this.state.btnClass}`}
+              className={`btn-primary${this.state.showBtn ? '' : ' hidden'}`}
               disabled={this.state.btnText === 'Sending...'}
             >
               {this.state.btnText}

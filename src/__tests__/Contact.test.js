@@ -33,8 +33,7 @@ describe('Initial values', () => {
       let state = wrapper.state()
 
       expect(state.btnText).to.equal('Send')
-      // TODO: should probably be changed to showBtn?
-      expect(state.btnClass).to.be.true
+      expect(state.showBtn).to.be.true
       expect(state.alertText).to.equal('')
       expect(state.alertClass).to.be.null
       expect(state.showAlert).to.be.false
@@ -91,6 +90,22 @@ describe('Output', () => {
       it('should be enabled', () => {
         mergeState(wrapper, { btnText: 'Hello, world!' })
         expect(wrapper.find('Button').prop('disabled')).to.be.false
+      })
+    })
+
+    describe('when showBtn is true', () => {
+      it('should be shown', () => {
+        mergeState(wrapper, { showBtn: true })
+        let expected = 'btn-primary'
+        expect(wrapper.find('Button').prop('className')).to.equal(expected)
+      })
+    })
+
+    describe('when showBtn is false', () => {
+      it('should be hidden', () => {
+        mergeState(wrapper, { showBtn: false })
+        let expected = 'btn-primary hidden'
+        expect(wrapper.find('Button').prop('className')).to.equal(expected)
       })
     })
   })
@@ -438,9 +453,9 @@ describe('Functions', () => {
         expect(wrapper.state('alertText')).to.equal(expectedText)
       })
 
-      it('sets the button class to "hidden"', () => {
+      it('hides the button', () => {
         wrapper.instance().showAlert('success')
-        expect(wrapper.state('btnClass')).to.equal('hidden')
+        expect(wrapper.state('showBtn')).to.be.false
       })
     })
 
@@ -451,10 +466,10 @@ describe('Functions', () => {
         expect(wrapper.state('alertText')).to.equal(expectedText)
       })
 
-      it('sets the button class to ""', () => {
-        mergeState(wrapper, { btnClass: 'hidden' })
+      it('shows the button', () => {
+        mergeState(wrapper, { showBtn: true })
         wrapper.instance().showAlert('danger')
-        expect(wrapper.state('btnClass')).to.equal('')
+        expect(wrapper.state('showBtn')).to.be.true
       })
     })
 
