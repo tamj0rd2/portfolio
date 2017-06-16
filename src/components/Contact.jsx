@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import { Button, Alert } from 'react-bootstrap'
 import FormSection from './FormSection'
-// TODO: use lodash instead of ramda
-import R from 'ramda'
+import _ from 'lodash'
 import validator from 'validator'
 
 // TODO: refactor all setState funcs to use lodash for merging
@@ -42,7 +41,7 @@ export default class Contact extends Component {
 
   handleOnChange(e, identifier) {
     // updates the value and validation for whichever input field got changed
-    let newState = R.clone(this.state.fields)
+    let newState = _.cloneDeep(this.state.fields)
     newState[identifier].value = e.target.value
     newState[identifier].isValid = this.isValid(identifier, e.target.value)
 
@@ -69,7 +68,7 @@ export default class Contact extends Component {
 
   formIsValid() {
     let errorsFound = 0
-    let newState = R.clone(this.state.fields)
+    let newState = _.cloneDeep(this.state.fields)
 
     for (let identifier in newState) {
       // show feedback for all fields now that the form has been submitted
@@ -106,7 +105,7 @@ export default class Contact extends Component {
 
   resetFormValidation() {
     // resets validation settings for all fields
-    let newState = R.clone(this.state.fields)
+    let newState = _.cloneDeep(this.state.fields)
 
     for (let identifier in newState) {
       newState[identifier].isValid = null
