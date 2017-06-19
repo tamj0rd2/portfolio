@@ -11,6 +11,7 @@ chai.use(chaiAsPromised)
 
 let mergeState = (component, newState) => {
   component.setState(previousState => _.merge({}, previousState, newState))
+  return component
 }
 
 let expectedFields = ['name', 'email', 'message']
@@ -295,63 +296,78 @@ describe('Functions', () => {
     })
   })
 
-  describe('formIsValid', () => {
-    // TODO: this shouldn't really be modifying the state. perhaps there should
-    // be a setFieldValidity function to handle that?
-    it('returns true or false', () => {
-      expect(wrapper.instance().formIsValid()).to.be.a('boolean')
+  describe('showHelp', () => {
+    let fields = {
+      validFields: ['message'],
+      invalidFields: ['name', 'email']
+    }
+
+    mergeState(wrapper, {
+      fields: { message: { showHelpBlock: true } }
     })
+    wrapper.instance().showHelp(fields)
+    let fieldsState = wrapper.state('fields')
 
-    it('it shows feedback for all fields', () => {
-      wrapper.instance().formIsValid()
-      let newFieldVals = wrapper.state('fields')
-      expectedFields.forEach(
-        field => expect(newFieldVals[field].showFeedback).to.be.true
-      )
-    })
-
-    describe('when any fields are invalid', () => {
-      let instance = shallow(<Contact />).instance()
-      mergeState(instance, {
-        fields: {
-          name: { isValid: false },
-          email: { isValid: true },
-          message: { isValid: false }
-        }
-      })
-      let returnValue = instance.formIsValid()
-
-      it('returns false', () => {
-        expect(returnValue).to.be.false
-      })
-
-      it('shows the helpblock for the offending fields', () => {
-        // instance.formIsValid()
-        expect(instance.state.fields.name.showHelpBlock).to.be.true
-        expect(instance.state.fields.email.showHelpBlock).to.be.false
-        expect(instance.state.fields.message.showHelpBlock).to.be.true
+    it('shows helpblocks for invalid fields', () => {
+      fields.invalidFields.forEach(field => {
+        expect(fieldsState[field].showHelpBlock).to.be.true
       })
     })
 
-    describe('when all fields are valid', () => {
-      let instance = shallow(<Contact />).instance()
-      mergeState(instance, {
-        fields: {
-          name: { isValid: true },
-          email: { isValid: true },
-          message: { isValid: true }
-        }
+    it('hides the helpblocks for valid fields', () => {
+      fields.validFields.forEach(field => {
+        expect(fieldsState[field].showHelpBlock).to.be.false
       })
-      let returnValue = instance.formIsValid()
+    })
+  })
 
-      it('returns true', () => {
-        expect(returnValue).to.be.true
+  describe('showAllFeedback', () => {
+    it('shows feedback for all fields', () => {
+      wrapper.instance().showAllFeedback()
+      let fieldsState = wrapper.state('fields')
+
+      for (let field in fieldsState) {
+        expect(fieldsState[field].showFeedback).to.be.true
+      }
+    })
+  })
+
+  describe('getInvalidFields', () => {
+    mergeState(wrapper, {
+      fields: {
+        name: { isValid: false },
+        email: { isValid: false },
+        message: { isValid: true }
+      }
+    })
+
+    let result = wrapper.instance().getInvalidFields()
+
+    it('returns an object', () => {
+      expect(result).to.be.an('object')
+    })
+
+    describe('validFields', () => {
+      it('is an array', () => {
+        expect(result.validFields).to.be.an('array')
       })
 
-      it('does not show any helpblocks', () => {
-        expect(instance.state.fields.name.showHelpBlock).to.be.false
-        expect(instance.state.fields.email.showHelpBlock).to.be.false
-        expect(instance.state.fields.message.showHelpBlock).to.be.false
+      it('is an array of the names of invalid fields', () => {
+        expect(result.validFields).to.contain('message')
+        expect(result.validFields).to.not.contain('name')
+        expect(result.validFields).to.not.contain('email')
+      })
+    })
+
+    describe('invalidFields', () => {
+      it('is an array', () => {
+        expect(result.invalidFields).to.be.an('array')
+      })
+
+      it('is an array of the names of invalid fields', () => {
+        expect(result.invalidFields).to.contain('name')
+        expect(result.invalidFields).to.contain('email')
+        expect(result.invalidFields).to.not.contain('message')
       })
     })
   })
@@ -484,34 +500,54 @@ describe('Functions', () => {
   })
 
   describe('handleSubmit', () => {
-    let wrapper, formIsValid, sendEmail, resetFormV, showAlert, promise
+    let wrapper, promise
+    let getInvalidFields, sendEmail, resetFormV, showAlert, showAllFB, showHelp
     let event = { preventDefault() {} }
 
     beforeEach(() => {
-      formIsValid = sinon.stub(Contact.prototype, 'formIsValid')
+      getInvalidFields = sinon.stub(Contact.prototype, 'getInvalidFields')
       sendEmail = sinon.stub(Contact.prototype, 'sendEmail')
       resetFormV = sinon.stub(Contact.prototype, 'resetFormValidation')
       showAlert = sinon.stub(Contact.prototype, 'showAlert')
+      showAllFB = sinon.stub(Contact.prototype, 'showAllFeedback')
+      showHelp = sinon.stub(Contact.prototype, 'showHelp')
       wrapper = shallow(<Contact />)
     })
 
     afterEach(() => {
-      formIsValid.restore()
+      getInvalidFields.restore()
       sendEmail.restore()
       resetFormV.restore()
       showAlert.restore()
+      showAllFB.restore()
+      showHelp.restore()
       promise = null
     })
 
     it('prevents the page from reloading on submit', () => {
       let preventDefault = sinon.stub(event, 'preventDefault')
+      getInvalidFields.returns({ validFields: [], invalidFields: ['abc'] })
       wrapper.instance().handleSubmit(event)
       expect(preventDefault.calledOnce).to.be.true
     })
 
-    describe('if the form is valid', () => {
+    it('calls getInvalidFields once', () => {
+      getInvalidFields.returns({ validFields: [], invalidFields: ['abc'] })
+      wrapper.instance().handleSubmit(event)
+      expect(getInvalidFields.calledOnce).to.be.true
+    })
+
+    it('calls showAllFeedback once', () => {
+      getInvalidFields.returns({ validFields: [], invalidFields: ['abc'] })
+      wrapper.instance().handleSubmit(event)
+      expect(showAllFB.calledOnce).to.be.true
+    })
+
+    describe('if there are no invalid fields', () => {
+      let validFields = ['name', 'email', 'message']
+
       beforeEach(() => {
-        formIsValid.returns(true)
+        getInvalidFields.returns({ validFields, invalidFields: [] })
       })
 
       describe('if the email was sent successfully', () => {
@@ -557,11 +593,25 @@ describe('Functions', () => {
       })
     })
 
-    describe('if the form is invalid', () => {
+    describe('if there are one or more invalid fields', () => {
+      let fields = {
+        invalidFields: ['name', 'message'],
+        validFields: ['email']
+      }
+
+      beforeEach(() => {
+        getInvalidFields.returns(fields)
+      })
+
       it('resolves to false', () => {
-        formIsValid.returns(false)
         promise = wrapper.instance().handleSubmit(event)
         return expect(promise).to.eventually.be.false
+      })
+
+      it('calls showHelp once with the array of invalid fields', () => {
+        wrapper.instance().handleSubmit(event)
+        expect(showHelp.calledOnce).to.be.true
+        expect(showHelp.calledWith(fields)).to.be.true
       })
     })
   })

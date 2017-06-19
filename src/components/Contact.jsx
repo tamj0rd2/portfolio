@@ -10,11 +10,13 @@ export default class Contact extends Component {
     super(props)
     this.handleOnChange = this.handleOnChange.bind(this)
     this.isValid = this.isValid.bind(this)
-    this.formIsValid = this.formIsValid.bind(this)
+    this.getInvalidFields = this.getInvalidFields.bind(this)
     this.sendEmail = this.sendEmail.bind(this)
     this.resetFormValidation = this.resetFormValidation.bind(this)
     this.showAlert = this.showAlert.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
+    this.showHelp = this.showHelp.bind(this)
+    this.showAllFeedback = this.showAllFeedback.bind(this)
 
     let state = {
       btnText: 'Send',
@@ -66,21 +68,23 @@ export default class Contact extends Component {
     }
   }
 
-  formIsValid() {
-    let errorsFound = 0
-    let newState = _.cloneDeep(this.state.fields)
-
-    for (let identifier in newState) {
-      // show feedback for all fields now that the form has been submitted
-      newState[identifier].showFeedback = true
-      // only show help block for invalid FormSections
-      let isValid = newState[identifier].isValid
-      if (isValid === false) errorsFound += 1
-      // if the field is valid don't show the help block, and vice versa
-      newState[identifier].showHelpBlock = !isValid
+  // TODO: rename this func to getFieldsValidity
+  getInvalidFields() {
+    // returns a list of invalid fields
+    let result = {
+      validFields: [],
+      invalidFields: []
     }
-    this.setState({ fields: newState })
-    return errorsFound === 0
+
+    _.keys(this.state.fields).forEach(field => {
+      if (this.state.fields[field].isValid) {
+        result.validFields.push(field)
+      } else {
+        result.invalidFields.push(field)
+      }
+    })
+
+    return result
   }
 
   sendEmail() {
@@ -138,6 +142,33 @@ export default class Contact extends Component {
     })
   }
 
+  showAllFeedback() {
+    this.setState(prevState => {
+      let newFieldsState = _.cloneDeep(prevState.fields)
+
+      _.keys(newFieldsState).forEach(field => {
+        newFieldsState[field].showFeedback = true
+      })
+
+      return { fields: newFieldsState }
+    })
+  }
+
+  showHelp(fields) {
+    this.setState(prevState => {
+      let newFieldsState = _.cloneDeep(prevState.fields)
+
+      fields.validFields.forEach(field => {
+        newFieldsState[field].showHelpBlock = false
+      })
+
+      fields.invalidFields.forEach(field => {
+        newFieldsState[field].showHelpBlock = true
+      })
+      return { fields: newFieldsState }
+    })
+  }
+
   handleSubmit(e) {
     // stop the page from reloading on submit
     e.preventDefault()
@@ -145,10 +176,11 @@ export default class Contact extends Component {
     // this isn't in the if statement because I want the alert to be hidden
     // every time the form gets submitted, even if the form is invalid.
     this.setState({ showAlert: false, alertClass: null })
+    this.showAllFeedback()
 
-    // TODO: formIsValid shouldn't modify state. By looking at the code it's
-    // unclear what happens if formIsValid is false.
-    if (this.formIsValid()) {
+    let fields = this.getInvalidFields()
+
+    if (fields.invalidFields.length === 0) {
       this.setState({ btnText: 'Sending...' })
       return this.sendEmail().then(emailSent => {
         if (emailSent) {
@@ -160,6 +192,7 @@ export default class Contact extends Component {
         return emailSent
       })
     } else {
+      this.showHelp(fields)
       return Promise.resolve(false)
     }
   }
