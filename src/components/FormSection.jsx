@@ -19,7 +19,7 @@ export default class FormSection extends Component {
 
   getValidationState() {
     let state = this.props.parentState[this.props.identifier]
-    if (state.showValidation) {
+    if (state.showFeedback) {
       if (state.isValid) return 'success'
       else return 'error'
     }

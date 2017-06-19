@@ -12,7 +12,7 @@ let props = {
   helpText: 'You did something wrong',
   parentState: {
     fieldname: {
-      showValidation: false,
+      showFeedback: false,
       isValid: false
     }
   },
@@ -169,7 +169,7 @@ describe('Functions', () => {
       it('returns "success" if the field value is valid', () => {
         let givenProps = _.merge({}, props, {
           parentState: {
-            fieldname: { showValidation: true, isValid: true }
+            fieldname: { showFeedback: true, isValid: true }
           }
         })
         let wrapper = shallow(<FormSection {...givenProps} />)
@@ -179,7 +179,7 @@ describe('Functions', () => {
       it('returns "error" if the field value is invalid', () => {
         let givenProps = _.merge({}, props, {
           parentState: {
-            fieldname: { showValidation: true, isValid: false }
+            fieldname: { showFeedback: true, isValid: false }
           }
         })
         let wrapper = shallow(<FormSection {...givenProps} />)
