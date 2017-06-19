@@ -332,7 +332,7 @@ describe('Functions', () => {
     })
   })
 
-  describe('getInvalidFields', () => {
+  describe('getFieldsValidity', () => {
     mergeState(wrapper, {
       fields: {
         name: { isValid: false },
@@ -341,7 +341,7 @@ describe('Functions', () => {
       }
     })
 
-    let result = wrapper.instance().getInvalidFields()
+    let result = wrapper.instance().getFieldsValidity()
 
     it('returns an object', () => {
       expect(result).to.be.an('object')
@@ -501,11 +501,11 @@ describe('Functions', () => {
 
   describe('handleSubmit', () => {
     let wrapper, promise
-    let getInvalidFields, sendEmail, resetFormV, showAlert, showAllFB, showHelp
+    let getFieldsValidity, sendEmail, resetFormV, showAlert, showAllFB, showHelp
     let event = { preventDefault() {} }
 
     beforeEach(() => {
-      getInvalidFields = sinon.stub(Contact.prototype, 'getInvalidFields')
+      getFieldsValidity = sinon.stub(Contact.prototype, 'getFieldsValidity')
       sendEmail = sinon.stub(Contact.prototype, 'sendEmail')
       resetFormV = sinon.stub(Contact.prototype, 'resetFormValidation')
       showAlert = sinon.stub(Contact.prototype, 'showAlert')
@@ -515,7 +515,7 @@ describe('Functions', () => {
     })
 
     afterEach(() => {
-      getInvalidFields.restore()
+      getFieldsValidity.restore()
       sendEmail.restore()
       resetFormV.restore()
       showAlert.restore()
@@ -526,19 +526,19 @@ describe('Functions', () => {
 
     it('prevents the page from reloading on submit', () => {
       let preventDefault = sinon.stub(event, 'preventDefault')
-      getInvalidFields.returns({ validFields: [], invalidFields: ['abc'] })
+      getFieldsValidity.returns({ validFields: [], invalidFields: ['abc'] })
       wrapper.instance().handleSubmit(event)
       expect(preventDefault.calledOnce).to.be.true
     })
 
-    it('calls getInvalidFields once', () => {
-      getInvalidFields.returns({ validFields: [], invalidFields: ['abc'] })
+    it('calls getFieldsValidity once', () => {
+      getFieldsValidity.returns({ validFields: [], invalidFields: ['abc'] })
       wrapper.instance().handleSubmit(event)
-      expect(getInvalidFields.calledOnce).to.be.true
+      expect(getFieldsValidity.calledOnce).to.be.true
     })
 
     it('calls showAllFeedback once', () => {
-      getInvalidFields.returns({ validFields: [], invalidFields: ['abc'] })
+      getFieldsValidity.returns({ validFields: [], invalidFields: ['abc'] })
       wrapper.instance().handleSubmit(event)
       expect(showAllFB.calledOnce).to.be.true
     })
@@ -547,7 +547,7 @@ describe('Functions', () => {
       let validFields = ['name', 'email', 'message']
 
       beforeEach(() => {
-        getInvalidFields.returns({ validFields, invalidFields: [] })
+        getFieldsValidity.returns({ validFields, invalidFields: [] })
       })
 
       describe('if the email was sent successfully', () => {
@@ -600,7 +600,7 @@ describe('Functions', () => {
       }
 
       beforeEach(() => {
-        getInvalidFields.returns(fields)
+        getFieldsValidity.returns(fields)
       })
 
       it('resolves to false', () => {

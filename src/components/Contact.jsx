@@ -9,7 +9,7 @@ export default class Contact extends Component {
     super(props)
     this.handleOnChange = this.handleOnChange.bind(this)
     this.isValid = this.isValid.bind(this)
-    this.getInvalidFields = this.getInvalidFields.bind(this)
+    this.getFieldsValidity = this.getFieldsValidity.bind(this)
     this.sendEmail = this.sendEmail.bind(this)
     this.resetFormValidation = this.resetFormValidation.bind(this)
     this.showAlert = this.showAlert.bind(this)
@@ -67,8 +67,7 @@ export default class Contact extends Component {
     }
   }
 
-  // TODO: rename this func to getFieldsValidity
-  getInvalidFields() {
+  getFieldsValidity() {
     // returns a list of invalid fields
     let result = {
       validFields: [],
@@ -178,7 +177,7 @@ export default class Contact extends Component {
     this.setState({ showAlert: false, alertClass: null })
     this.showAllFeedback()
 
-    let fields = this.getInvalidFields()
+    let fields = this.getFieldsValidity()
 
     if (fields.invalidFields.length === 0) {
       this.setState({ btnText: 'Sending...' })
