@@ -4,7 +4,6 @@ import FormSection from './FormSection'
 import _ from 'lodash'
 import validator from 'validator'
 
-// TODO: refactor all setState funcs to use lodash for merging
 export default class Contact extends Component {
   constructor(props) {
     super(props)
@@ -42,14 +41,14 @@ export default class Contact extends Component {
   }
 
   handleOnChange(e, identifier) {
-    // updates the value and validation for whichever input field got changed
-    let newState = _.cloneDeep(this.state.fields)
-    newState[identifier].value = e.target.value
-    newState[identifier].isValid = this.isValid(identifier, e.target.value)
-
-    // the value changed so hide feedback until the next form submission
-    newState[identifier].showFeedback = false
-    this.setState({ fields: newState })
+    // updates the value and hides validation for whichever input field changed
+    this.setState(prevState => {
+      let newState = _.cloneDeep(prevState.fields)
+      newState[identifier].value = e.target.value
+      newState[identifier].isValid = this.isValid(identifier, e.target.value)
+      newState[identifier].showFeedback = false
+      return { fields: newState }
+    })
   }
 
   isValid(validatorName, newValue) {
@@ -109,15 +108,16 @@ export default class Contact extends Component {
 
   resetFormValidation() {
     // resets validation settings for all fields
-    let newState = _.cloneDeep(this.state.fields)
+    this.setState(prevState => {
+      let newState = _.cloneDeep(prevState.fields)
 
-    for (let identifier in newState) {
-      newState[identifier].isValid = null
-      newState[identifier].showHelpBlock = false
-      newState[identifier].showFeedback = false
-    }
-
-    this.setState({ fields: newState })
+      for (let identifier in newState) {
+        newState[identifier].isValid = null
+        newState[identifier].showHelpBlock = false
+        newState[identifier].showFeedback = false
+      }
+      return { fields: newState }
+    })
   }
 
   showAlert(status) {
