@@ -2,7 +2,7 @@ import _ from 'lodash'
 import sinon from 'sinon'
 import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import { shallow } from 'enzyme'
+import { shallow, mount } from 'enzyme'
 
 import React from 'react'
 import Contact from '../components/Contact'
@@ -146,6 +146,28 @@ describe('Output', () => {
           expect(alertHeaderText).to.equal('Oops!')
         })
       })
+    })
+  })
+})
+
+describe('Events', () => {
+  let wrapper, handleSubmit
+
+  beforeEach(() => {
+    handleSubmit = sinon.stub(Contact.prototype, 'handleSubmit')
+    wrapper = mount(<Contact />)
+  })
+
+  afterEach(() => {
+    handleSubmit.restore()
+  })
+
+  describe('when the form is submitted', () => {
+    it('calls handleOnSubmit with an event', () => {
+      wrapper.find('form').simulate('submit')
+      expect(handleSubmit.calledOnce).to.be.true
+      expect(handleSubmit.firstCall.args).to.have.length(1)
+      expect(handleSubmit.firstCall.args[0]).to.be.an('object')
     })
   })
 })
