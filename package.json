@@ -5,7 +5,6 @@
   "dependencies": {
     "bootstrap": "^3.3.7",
     "lodash": "^4.17.4",
-    "prettier-eslint-cli": "^4.1.1",
     "prop-types": "^15.5.10",
     "react": "^15.5.4",
     "react-bootstrap": "^0.31.0",
@@ -34,6 +33,7 @@
     "husky": "^0.13.4",
     "lint-staged": "^3.6.1",
     "prettier-eslint": "^6.2.3",
+    "prettier-eslint-cli": "^4.1.1",
     "react-scripts": "1.0.7",
     "react-test-renderer": "^15.5.4",
     "sinon": "^2.3.2"
