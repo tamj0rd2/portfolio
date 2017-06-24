@@ -1,76 +1,38 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import R from 'ramda'
+import { Button, Alert } from 'react-bootstrap'
+import FormSection from './FormSection'
+import _ from 'lodash'
 import validator from 'validator'
-import {
-  FormGroup,
-  FormControl,
-  ControlLabel,
-  HelpBlock,
-  Button,
-  Alert
-} from 'react-bootstrap'
 
-class FormSection extends Component {
-  // When creating a form item, we pass it the parent's state so that we can
-  // programatically set the state for the correct item during the onchange
-  render() {
-    let state = this.props.parentState[this.props.identifier]
-    let validationState = null
-
-    if (state.showValidation) {
-      if (state.isValid) validationState = 'success'
-      else validationState = 'error'
-    }
-
-    return (
-      <FormGroup validationState={validationState}>
-        <ControlLabel>{`${this.props.labelText} *`}</ControlLabel>
-        <FormControl
-          componentClass={this.props.componentClass}
-          type={this.props.inputType}
-          value={state.value}
-          onChange={e => this.props.onChange(e, this.props.identifier)}
-        />
-        <FormControl.Feedback />
-        <HelpBlock className={state.showHelpBlock ? '' : 'hidden'}>
-          {this.props.helpText}
-        </HelpBlock>
-      </FormGroup>
-    )
-  }
-}
-FormSection.defaultProps = {
-  componentClass: 'input',
-  inputType: null
-}
-FormSection.propTypes = {
-  labelText: PropTypes.string.isRequired,
-  identifier: PropTypes.string.isRequired,
-  helpText: PropTypes.string.isRequired,
-  componentClass: PropTypes.string,
-  inputType: PropTypes.string,
-  parentState: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired
-}
-
-class Contact extends Component {
+export default class Contact extends Component {
   constructor(props) {
     super(props)
+    this.handleOnChange = this.handleOnChange.bind(this)
+    this.isValid = this.isValid.bind(this)
+    this.getFieldsValidity = this.getFieldsValidity.bind(this)
+    this.sendEmail = this.sendEmail.bind(this)
+    this.resetFormValidation = this.resetFormValidation.bind(this)
+    this.showAlert = this.showAlert.bind(this)
+    this.handleSubmit = this.handleSubmit.bind(this)
+    this.showHelp = this.showHelp.bind(this)
+    this.showAllFeedback = this.showAllFeedback.bind(this)
+
     let state = {
       btnText: 'Send',
-      btnClass: true,
+      showBtn: true,
       alertText: '',
       alertClass: null,
       showAlert: false,
       fields: {}
-    };
+    }
 
-    ['name', 'email', 'message'].forEach(identifier => {
+    let fieldNames = ['name', 'email', 'message']
+
+    fieldNames.forEach(identifier => {
       state.fields[identifier] = {
         value: '',
         isValid: null,
-        showValidation: false,
+        showFeedback: false,
         showHelpBlock: false
       }
     })
@@ -78,19 +40,22 @@ class Contact extends Component {
     this.state = state
   }
 
-  handleOnChange = (e, identifier) => {
-    // updates the value and validation for whichever input field got changed
-    let newState = R.clone(this.state.fields)
-    newState[identifier].value = e.target.value
-    newState[identifier].isValid = this.isValid(identifier, e.target.value)
+  handleOnChange(e, identifier) {
+    // updates the value and hides validation for whichever input field changed
+    this.setState(prevState => {
+      let newState = _.cloneDeep(prevState.fields)
+      newState[identifier].value = e.target.value
+      newState[identifier].isValid = this.isValid(identifier, e.target.value)
+      newState[identifier].showFeedback = false
+      return { fields: newState }
+    })
+  }
 
-    // the value changed so hide validation until the next form submission
-    newState[identifier].showValidation = false
-    this.setState({ fields: newState })
-  };
-
-  isValid = (identifier, newValue) => {
-    switch (identifier) {
+  isValid(validatorName, newValue) {
+    if (!newValue) {
+      return false
+    }
+    switch (validatorName) {
       case 'name':
         return /^[A-z0-9\s._-]{3,50}$/.test(newValue)
       case 'email':
@@ -100,27 +65,27 @@ class Contact extends Component {
       default:
         return false
     }
-  };
+  }
 
-  formIsValid = () => {
-    let noErrorsFound = true
-
-    // show validation for each FormSection, since we've submitted the form now
-    let newState = R.clone(this.state.fields)
-
-    for (let identifier in newState) {
-      newState[identifier].showValidation = true
-      // only show help block for invalid FormSections
-      let isValid = newState[identifier].isValid
-      if (!isValid) noErrorsFound = false
-      newState[identifier].showHelpBlock = !isValid
+  getFieldsValidity() {
+    // returns a list of invalid fields
+    let result = {
+      validFields: [],
+      invalidFields: []
     }
-    this.setState({ fields: newState })
-    return noErrorsFound
-  };
 
-  sendEmail = () => {
-    // using JSON.stringify doesn't send any data in the request
+    _.keys(this.state.fields).forEach(field => {
+      if (this.state.fields[field].isValid) {
+        result.validFields.push(field)
+      } else {
+        result.invalidFields.push(field)
+      }
+    })
+
+    return result
+  }
+
+  sendEmail() {
     let formData = new FormData()
     formData.append('Name', this.state.fields.name.value)
     formData.append('Email', this.state.fields.email.value)
@@ -128,6 +93,7 @@ class Contact extends Component {
     formData.append('_subject', 'Portfolio response received')
     formData.append('_gotcha', '')
 
+    // resolves true if the email got sent, otherwise false
     return fetch('https://formspree.io/tamj0rd2@outlook.com', {
       headers: {
         Accept: 'application/json'
@@ -135,62 +101,100 @@ class Contact extends Component {
       method: 'POST',
       body: formData
     })
-  };
+      .then(response => response.status === 200)
+      .catch(error => false)
+  }
 
-  resetFormValidation = () => {
+  resetFormValidation() {
     // resets validation settings for all fields
-    let newState = R.clone(this.state.fields)
+    this.setState(prevState => {
+      let newState = _.cloneDeep(prevState.fields)
 
-    for (let identifier in newState) {
-      newState[identifier].isValid = null
-      newState[identifier].showHelpBlock = false
-      newState[identifier].showValidation = false
-    }
+      for (let identifier in newState) {
+        newState[identifier].isValid = null
+        newState[identifier].showHelpBlock = false
+        newState[identifier].showFeedback = false
+      }
+      return { fields: newState }
+    })
+  }
 
-    this.setState({ fields: newState })
-  };
-
-  showAlert = status => {
-    let alertText = ''
-    let btnClass = ''
+  showAlert(status) {
+    let alertText, showBtn
 
     if (status === 'success') {
       alertText = 'Your email has been sent :)'
-      btnClass = 'hidden'
+      showBtn = false
     } else if (status === 'danger') {
       alertText = 'Something went wrong. Please try again.'
+      showBtn = true
+    } else {
+      throw new TypeError('showAlert called with invalid status')
     }
+
     this.setState({
       btnText: 'Send',
-      btnClass: btnClass,
+      showBtn: showBtn,
       showAlert: true,
       alertClass: status,
       alertText: alertText
     })
-  };
+  }
 
-  handleSubmit = e => {
+  showAllFeedback() {
+    this.setState(prevState => {
+      let newFieldsState = _.cloneDeep(prevState.fields)
+
+      _.keys(newFieldsState).forEach(field => {
+        newFieldsState[field].showFeedback = true
+      })
+
+      return { fields: newFieldsState }
+    })
+  }
+
+  showHelp(fields) {
+    this.setState(prevState => {
+      let newFieldsState = _.cloneDeep(prevState.fields)
+
+      fields.validFields.forEach(field => {
+        newFieldsState[field].showHelpBlock = false
+      })
+
+      fields.invalidFields.forEach(field => {
+        newFieldsState[field].showHelpBlock = true
+      })
+      return { fields: newFieldsState }
+    })
+  }
+
+  handleSubmit(e) {
     // stop the page from reloading on submit
     e.preventDefault()
 
     // this isn't in the if statement because I want the alert to be hidden
     // every time the form gets submitted, even if the form is invalid.
     this.setState({ showAlert: false, alertClass: null })
+    this.showAllFeedback()
 
-    if (this.formIsValid()) {
+    let fields = this.getFieldsValidity()
+
+    if (fields.invalidFields.length === 0) {
       this.setState({ btnText: 'Sending...' })
-      this.sendEmail()
-        .then(response => {
-          if (response.status === 200) {
-            this.resetFormValidation()
-            this.showAlert('success')
-          } else {
-            this.showAlert('danger')
-          }
-        })
-        .catch(err => this.showAlert('danger'))
+      return this.sendEmail().then(emailSent => {
+        if (emailSent) {
+          this.resetFormValidation()
+          this.showAlert('success')
+        } else {
+          this.showAlert('danger')
+        }
+        return emailSent
+      })
+    } else {
+      this.showHelp(fields)
+      return Promise.resolve(false)
     }
-  };
+  }
 
   render() {
     return (
@@ -237,7 +241,7 @@ class Contact extends Component {
 
             <Button
               type="submit"
-              className={`btn-primary ${this.state.btnClass}`}
+              className={`btn-primary${this.state.showBtn ? '' : ' hidden'}`}
               disabled={this.state.btnText === 'Sending...'}
             >
               {this.state.btnText}
@@ -249,5 +253,3 @@ class Contact extends Component {
     )
   }
 }
-
-export default Contact

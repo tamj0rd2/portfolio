@@ -4,8 +4,9 @@
   "private": true,
   "dependencies": {
     "bootstrap": "^3.3.7",
+    "lodash": "^4.17.4",
+    "prettier-eslint-cli": "^4.1.1",
     "prop-types": "^15.5.10",
-    "ramda": "^0.24.1",
     "react": "^15.5.4",
     "react-bootstrap": "^0.31.0",
     "react-dom": "^15.5.4",
@@ -13,24 +14,55 @@
   },
   "devDependencies": {
     "@types/bootstrap": "^3.3.33",
+    "@types/chai": "^3.5.2",
+    "@types/chai-as-promised": "0.0.31",
+    "@types/enzyme": "^2.8.0",
+    "@types/fetch-mock": "^5.8.2",
+    "@types/lodash": "^4.14.65",
     "@types/prop-types": "^15.5.1",
-    "@types/ramda": "0.0.11",
     "@types/react": "^15.0.26",
     "@types/react-bootstrap": "0.0.50",
     "@types/react-dom": "^15.5.0",
+    "@types/react-test-renderer": "^15.5.0",
+    "@types/sinon": "^2.3.0",
     "@types/validator": "^6.2.0",
+    "chai": "^3.5.0",
+    "chai-as-promised": "^6.0.0",
+    "enzyme": "^2.8.2",
+    "fetch-mock": "^5.11.0",
     "gh-pages": "^1.0.0",
+    "husky": "^0.13.4",
+    "lint-staged": "^3.6.1",
     "prettier-eslint": "^6.2.3",
-    "react-scripts": "1.0.7"
+    "react-scripts": "1.0.7",
+    "react-test-renderer": "^15.5.4",
+    "sinon": "^2.3.2"
+  },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "yarn run test:codestyle"
+    ]
   },
   "scripts": {
+    "precommit": "lint-staged",
+    "prepush": "CI=true yarn run test:coverage",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject",
-    "predeploy": "git add --all && git stash -u && npm run build",
-    "deploy": "gh-pages -d build -b master -r git@github.com:tamj0rd2/tamj0rd2.github.io.git",
-    "postdeploy": "git stash pop"
+    "test:coverage": "react-scripts test --env=jsdom --coverage \"--collectCoverageFrom=src/**/*.{js|jsx}\" \"--collectCoverageFrom=!src/{registerServiceWorker|index}.js\"",
+    "test:codestyle": "prettier-eslint \"./src/**/*.{js,jsx}\" --list-different",
+    "format": "prettier-eslint \"./src/**/*.{js,jsx}\" --write",
+    "eject": "react-scripts eject"
+  },
+  "engines": {
+    "node": ">=6.10.3",
+    "npm": ">=3.10.10"
+  },
+  "babel": {
+    "sourceMaps": "inline",
+    "presets": [
+      "react-app"
+    ]
   },
   "homepage": "https://tamj0rd2.github.io"
 }
