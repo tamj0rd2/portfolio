@@ -15,6 +15,7 @@ deploy:
   github_token: $GITHUB_TOKEN
   repo: tamj0rd2/tamj0rd2.github.io
   target_branch: master
+  local_dir: build
   project_name: tamj0rd2.github.io
   on:
     branch: master
