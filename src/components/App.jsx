@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import About from './components/About.jsx'
-import Contact from './components/Contact.jsx'
+import About from './About'
+import Contact from './Contact'
 
 class App extends Component {
   render() {

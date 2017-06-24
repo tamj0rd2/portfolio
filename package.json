@@ -45,7 +45,7 @@
   },
   "scripts": {
     "precommit": "lint-staged",
-    "prepush": "CI=true yarn run test:coverage",
+    "prepush": "yarn run test:coverage && yarn run build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
