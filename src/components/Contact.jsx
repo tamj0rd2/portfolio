@@ -41,11 +41,14 @@ export default class Contact extends Component {
   }
 
   handleOnChange(e, identifier) {
-    // updates the value and hides validation for whichever input field changed
+    // updates the value and hides validation for whichever input field changed.
+    // we have to store the value here because the event doesn't persist
+    let newValue = e.target.value
+
     this.setState(prevState => {
       let newState = _.cloneDeep(prevState.fields)
-      newState[identifier].value = e.target.value
-      newState[identifier].isValid = this.isValid(identifier, e.target.value)
+      newState[identifier].value = newValue
+      newState[identifier].isValid = this.isValid(identifier, newValue)
       newState[identifier].showFeedback = false
       return { fields: newState }
     })
