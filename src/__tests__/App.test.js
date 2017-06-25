@@ -17,6 +17,10 @@ describe('output', () => {
     expectOne('About', wrapper)
   })
 
+  it('renders a Projects section', () => {
+    expectOne('Projects', wrapper)
+  })
+
   it('renders a Contact section', () => {
     expectOne('Contact', wrapper)
   })
