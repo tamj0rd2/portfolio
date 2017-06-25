@@ -16,5 +16,9 @@ describe('Output', () => {
     it('has the className "container"', () => {
       expect(wrapper.find('main').prop('className')).to.equal('container')
     })
+
+    it('contains a Project component', () => {
+      expectOne('Project', wrapper)
+    })
   })
 })
