@@ -17,7 +17,7 @@ describe('output', () => {
     expectOne('About', wrapper)
   })
 
-  it('renders an About section', () => {
+  it('renders a Contact section', () => {
     expectOne('Contact', wrapper)
   })
 })
