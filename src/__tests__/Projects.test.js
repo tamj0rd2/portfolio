@@ -13,6 +13,7 @@ describe('Output', () => {
   })
 
   describe('main', () => {
+    // TODO: move this to initial values/props test
     it('has the className "container"', () => {
       expect(wrapper.find('main').prop('className')).to.equal('container')
     })

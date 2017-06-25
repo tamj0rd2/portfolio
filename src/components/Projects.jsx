@@ -5,7 +5,7 @@ export default class Projects extends Component {
   render() {
     return (
       <main className="container">
-        <Project />
+        <Project name="A Name" description="A desc" imagePath="A/path" />
       </main>
     )
   }
